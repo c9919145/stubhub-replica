@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details - StubHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/event.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+          <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Stub</text>
+          <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Hub</text>
+        </svg>
+      </a>
+      <div class="header-search">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Search events, artists, teams and more" id="header-search-input">
+      </div>
+      <div class="header-actions">
+        <a href="#" class="btn btn-secondary btn-sm">Sell</a>
+        <a href="#" class="btn btn-ghost btn-sm">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          Favorites
+        </a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">My Tickets</a>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <div class="header-nav-inner">
+        <a href="index.html" class="nav-link">Sports</a>
+        <a href="index.html" class="nav-link">Concerts</a>
+        <a href="index.html" class="nav-link">Theater</a>
+        <a href="index.html" class="nav-link">Festivals</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- EVENT DETAIL -->
+  <main class="event-page">
+    <div class="container">
+      <!-- Event Hero -->
+      <div class="event-hero" id="event-hero">
+        <div class="event-hero-image">
+          <img id="event-image" src="" alt="">
+        </div>
+        <div class="event-hero-info">
+          <h1 id="event-name"></h1>
+          <div class="event-meta">
+            <div class="event-meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span id="event-date"></span>
+            </div>
+            <div class="event-meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span id="event-venue"></span>
+            </div>
+            <div class="event-meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="event-city"></span>
+            </div>
+          </div>
+          <div class="event-actions">
+            <a class="btn btn-primary btn-lg" id="buy-tickets-btn" href="checkout.html?event=1">Buy Tickets</a>
+            <button class="btn btn-secondary btn-lg" onclick="document.getElementById('tickets-section').scrollIntoView({behavior:'smooth'})">See Tickets</button>
+            <button class="btn btn-ghost btn-lg" id="sell-btn">Sell</button>
+            <button class="btn btn-ghost btn-lg" id="share-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seat Map -->
+      <div class="seat-map">
+        <h2 class="section-title" style="margin-bottom:var(--spacing-300)">Venue Map</h2>
+        <div class="seat-map-placeholder">
+          <div class="seat-map-stage">STAGE</div>
+          <div class="seat-map-sections">
+            <div class="seat-map-section floor">Floor / Pit</div>
+            <div class="seat-map-section lower">Lower Level</div>
+            <div class="seat-map-section club">Club Level</div>
+            <div class="seat-map-section upper">Upper Level</div>
+            <div class="seat-map-section balcony">Balcony</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Listings -->
+      <section class="ticket-section" id="tickets-section">
+        <h2>Available Tickets</h2>
+        <div class="ticket-filters">
+          <button class="pill active" data-section="all">All Sections</button>
+          <button class="pill" data-section="Floor / Pit">Floor</button>
+          <button class="pill" data-section="Lower Level">Lower</button>
+          <button class="pill" data-section="Club Level">Club</button>
+          <button class="pill" data-section="Upper Level">Upper</button>
+          <button class="pill" data-section="Balcony">Balcony</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ticket-table" id="ticket-table">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th>Row</th>
+                <th>Seats</th>
+                <th>Qty</th>
+                <th>Delivery</th>
+                <th>Price</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ticket-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Venue Info -->
+      <section class="venue-info" id="venue-info">
+        <div class="venue-info-card">
+          <h3>Venue Information</h3>
+          <p class="address" id="venue-address"></p>
+          <p id="venue-detail">For the best experience, arrive early. Parking is available on-site. Mobile entry is available for all events.</p>
+        </div>
+        <div class="venue-info-card">
+          <h3>Event Details</h3>
+          <p id="event-description">Get ready for an unforgettable experience! This event features world-class entertainment in a state-of-the-art venue. Don't miss your chance to be part of the action.</p>
+          <p style="margin-top:var(--spacing-100);"><strong>Age requirement:</strong> All ages welcome</p>
+        </div>
+      </section>
+
+      <!-- Similar Events -->
+      <section class="similar-events">
+        <h2 class="section-title">Similar Events</h2>
+        <div class="carousel-track" id="similar-events-carousel" style="gap:var(--spacing-200);"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+            <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+            <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+            <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Stub</text>
+            <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Hub</text>
+          </svg>
+        </div>
+        <p>StubHub is the world's top destination for ticket buyers and resellers.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Newsroom</a>
+        <a href="#">Careers</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="footer-col">
+        <h4>Top Cities</h4>
+        <a href="#">New York</a>
+        <a href="#">Los Angeles</a>
+        <a href="#">Chicago</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2000-2026 StubHub. All Rights Reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#">User Agreement</a>
+        <a href="#">Privacy Notice</a>
+        <a href="#">Cookie Notice</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/event.js"></script>
+</body>
+</html>

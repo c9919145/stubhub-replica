@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation - StubHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/checkout.css">
+  <style>
+    .confirmation-page { padding: var(--spacing-500) 0 var(--spacing-700); max-width: 760px; margin: 0 auto; }
+    .confirmation-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--spacing-400); margin-bottom: var(--spacing-300); }
+    .confirmation-status { display: flex; align-items: flex-start; gap: var(--spacing-300); }
+    .status-icon { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .status-icon.paid, .status-icon.success { background: #dcfce7; color: #166534; }
+    .status-icon.pending { background: #e0e7ff; color: #3730a3; }
+    .status-icon.expired, .status-icon.failed, .status-icon.cancelled, .status-icon.refunded { background: #fee2e2; color: #991b1b; }
+    .status-icon span { font-size: 22px; }
+    .confirmation-card h1 { font-size: var(--font-size-600); font-weight: 700; margin-bottom: var(--spacing-100); }
+    .order-number { color: var(--color-brand); font-weight: 700; }
+    .ticket-list { margin: var(--spacing-300) 0; }
+    .ticket-list-item { display: flex; justify-content: space-between; gap: var(--spacing-200); padding: var(--spacing-200) 0; border-bottom: 1px solid var(--color-border); font-size: var(--font-size-200); }
+    .summary-row { font-size: var(--font-size-200); }
+    .note { color: var(--color-text-secondary); font-size: var(--font-size-200); margin-top: var(--spacing-200); }
+    .confirmation-actions { display: flex; gap: var(--spacing-200); flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+          <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Stub</text>
+          <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Hub</text>
+        </svg>
+      </a>
+      <div class="header-search">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Search events, artists, teams and more" id="header-search-input">
+      </div>
+      <div class="header-actions">
+        <a href="search.html" class="btn btn-secondary btn-sm">Sell</a>
+        <a href="tickets.html" class="btn btn-ghost btn-sm">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          Favorites
+        </a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">My Tickets</a>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <div class="header-nav-inner">
+        <a href="index.html" class="nav-link">Sports</a>
+        <a href="index.html" class="nav-link">Concerts</a>
+        <a href="index.html" class="nav-link">Theater</a>
+        <a href="index.html" class="nav-link">Festivals</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="confirmation-page">
+    <div class="checkout-loading" id="confirmation-loading">
+      <div class="spinner" role="status"><span class="visually-hidden">Loading your order…</span></div>
+    </div>
+    <div class="checkout-alert checkout-alert-danger hidden" id="confirmation-error" role="alert" aria-live="assertive"></div>
+    <div id="confirmation-content" class="hidden"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+            <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+            <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+            <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Stub</text>
+            <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Hub</text>
+          </svg>
+        </div>
+        <p>StubHub is the world's top destination for ticket buyers and resellers.</p>
+      </div>
+      <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Newsroom</a><a href="#">Careers</a></div>
+      <div class="footer-col"><h4>Support</h4><a href="#">Help Center</a><a href="#">Gift Cards</a><a href="#">Contact Us</a></div>
+      <div class="footer-col"><h4>Top Cities</h4><a href="#">New York</a><a href="#">Los Angeles</a><a href="#">Chicago</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2000-2026 StubHub. All Rights Reserved.</p>
+      <div class="footer-bottom-links"><a href="#">User Agreement</a><a href="#">Privacy Notice</a><a href="#">Cookie Notice</a></div>
+    </div>
+  </footer>
+
+  <script src="js/confirmation.js"></script>
+</body>
+</html>

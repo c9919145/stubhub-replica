@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Orders - StubHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+          <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Stub</text>
+          <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Hub</text>
+        </svg>
+      </a>
+      <div class="header-actions" style="margin-left:auto;">
+        <a href="index.html" class="btn btn-ghost btn-sm">Back to site</a>
+        <button class="btn btn-secondary btn-sm" id="logout-btn">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-page">
+    <div class="container">
+      <h1>Admin</h1>
+      <p class="admin-sub">View orders and gift cards. No payment card data is ever shown.</p>
+
+      <nav class="admin-tabs" id="admin-tabs" aria-label="Admin sections">
+        <button type="button" class="admin-tab is-active" data-tab="orders" id="tab-orders-btn">Orders</button>
+        <button type="button" class="admin-tab" data-tab="giftcards" id="tab-giftcards-btn">Gift cards</button>
+      </nav>
+
+      <div class="admin-login" id="admin-login">
+        <label for="admin-email">Admin email</label>
+        <input type="email" id="admin-email" autocomplete="username">
+        <label for="admin-password">Password</label>
+        <input type="password" id="admin-password" autocomplete="current-password">
+        <p class="admin-error" id="admin-error" aria-live="assertive"></p>
+        <button class="btn btn-primary" id="admin-login-btn">Sign in to admin</button>
+      </div>
+
+      <div class="checkout-alert checkout-alert-danger hidden" id="admin-error-banner" role="alert"></div>
+      <div class="checkout-alert checkout-alert-success hidden" id="admin-success-banner" role="status"></div>
+      <div class="checkout-loading" id="admin-loading">
+        <div class="spinner" role="status"><span class="visually-hidden">Loading…</span></div>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <section class="admin-panel" id="panel-orders">
+        <div class="hidden" id="admin-table-wrap">
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="admin-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Event / Tickets</th>
+                  <th>Amount</th>
+                  <th>Payment</th>
+                  <th>Order status</th>
+                  <th>Date</th>
+                  <th>Provider ref</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="admin-tbody"></tbody>
+            </table>
+          </div>
+          <p class="admin-empty hidden" id="admin-empty">No orders yet.</p>
+        </div>
+      </section>
+
+      <!-- GIFT CARD TAB -->
+      <section class="admin-panel hidden" id="panel-giftcards">
+        <h2>Create gift cards</h2>
+        <form class="gc-create-form" id="gc-create-form">
+          <label for="gc-value">Value (USD)</label>
+          <input type="number" id="gc-value" min="1" step="0.01" value="100.00" required>
+          <label for="gc-count">Quantity</label>
+          <input type="number" id="gc-count" min="1" max="100" step="1" value="1" required>
+          <button type="submit" class="btn btn-primary">Create gift card(s)</button>
+        </form>
+        <div class="gc-results hidden" id="gc-results">
+          <p class="gc-results-title">New gift card codes (shown once — save them now):</p>
+          <ul class="gc-code-list" id="gc-code-list"></ul>
+        </div>
+
+        <h2>Gift cards</h2>
+        <div class="hidden" id="gc-table-wrap">
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="gc-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Value</th>
+                  <th>Redeemed</th>
+                  <th>Held</th>
+                  <th>Available</th>
+                  <th>Status</th>
+                  <th>Expires</th>
+                  <th>Created</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="gc-tbody"></tbody>
+            </table>
+          </div>
+          <p class="admin-empty hidden" id="gc-empty">No gift cards yet.</p>
+        </div>
+
+        <div class="gc-history hidden" id="gc-history">
+          <h3>Redemption history <button type="button" class="btn btn-ghost btn-sm" id="gc-history-close">Close</button></h3>
+          <table class="admin-table" id="gc-history-table">
+            <thead>
+              <tr><th>Order</th><th>Amount</th><th>Kind</th><th>Date</th></tr>
+            </thead>
+            <tbody id="gc-history-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

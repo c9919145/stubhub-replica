@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Results - StubHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/search.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+          <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Stub</text>
+          <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Hub</text>
+        </svg>
+      </a>
+      <div class="header-search">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Search events, artists, teams and more" id="header-search-input">
+      </div>
+      <div class="header-actions">
+        <a href="#" class="btn btn-secondary btn-sm">Sell</a>
+        <a href="#" class="btn btn-ghost btn-sm">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          Favorites
+        </a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">My Tickets</a>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <div class="header-nav-inner">
+        <a href="index.html" class="nav-link">Sports</a>
+        <a href="index.html" class="nav-link">Concerts</a>
+        <a href="index.html" class="nav-link">Theater</a>
+        <a href="index.html" class="nav-link">Festivals</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- SEARCH RESULTS -->
+  <main class="search-page">
+    <div class="container">
+      <div class="search-header">
+        <h1 id="search-title">Search Results</h1>
+        <p id="search-subtitle">Find tickets to live events</p>
+      </div>
+
+      <div class="search-layout">
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+          <div class="filter-group">
+            <h4>Category</h4>
+            <label><input type="checkbox" value="sports" class="filter-checkbox"> Sports</label>
+            <label><input type="checkbox" value="concerts" class="filter-checkbox"> Concerts</label>
+            <label><input type="checkbox" value="theater" class="filter-checkbox"> Theater</label>
+            <label><input type="checkbox" value="comedy" class="filter-checkbox"> Comedy</label>
+          </div>
+
+          <div class="filter-group">
+            <h4>Price Range</h4>
+            <div class="price-range">
+              <input type="number" placeholder="Min" id="price-min">
+              <span>-</span>
+              <input type="number" placeholder="Max" id="price-max">
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <h4>Date</h4>
+            <label><input type="checkbox" value="today" class="date-filter"> Today</label>
+            <label><input type="checkbox" value="this-week" class="date-filter"> This Week</label>
+            <label><input type="checkbox" value="this-month" class="date-filter"> This Month</label>
+            <label><input type="checkbox" value="next-month" class="date-filter"> Next Month</label>
+          </div>
+
+          <button class="btn btn-secondary w-full" onclick="resetFilters()">Clear All Filters</button>
+        </aside>
+
+        <!-- Results -->
+        <div class="results-main">
+          <div class="sort-bar">
+            <span class="results-count" id="results-count"></span>
+            <div class="flex items-center gap-200">
+              <select id="sort-select">
+                <option value="relevance">Sort by: Relevance</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="date">Date: Nearest First</option>
+              </select>
+              <div class="view-toggle">
+                <button class="active" id="grid-view" title="Grid view">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </button>
+                <button id="list-view" title="List view">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="artist-network hidden" id="artist-network"></div>
+
+          <div class="results-grid" id="results-grid"></div>
+
+          <div class="no-results hidden" id="no-results">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+            <h2>No results found</h2>
+            <p>Try a different search term or adjust your filters</p>
+          </div>
+
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+            <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+            <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+            <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Stub</text>
+            <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Hub</text>
+          </svg>
+        </div>
+        <p>StubHub is the world's top destination for ticket buyers and resellers.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Newsroom</a>
+        <a href="#">Careers</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="footer-col">
+        <h4>Top Cities</h4>
+        <a href="#">New York</a>
+        <a href="#">Los Angeles</a>
+        <a href="#">Chicago</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2000-2026 StubHub. All Rights Reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#">User Agreement</a>
+        <a href="#">Privacy Notice</a>
+        <a href="#">Cookie Notice</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

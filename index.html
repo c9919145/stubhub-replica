@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buy sports, concert and theater tickets on StubHub!</title>
+  <meta name="description" content="Buy and sell sports tickets, concert tickets, theater tickets and Broadway tickets on StubHub!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/homepage.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+          <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Stub</text>
+          <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Hub</text>
+        </svg>
+      </a>
+
+      <div class="header-search">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Search events, artists, teams and more" id="header-search-input">
+      </div>
+
+      <div class="header-actions">
+        <a href="search.html" class="btn btn-secondary btn-sm">Sell</a>
+        <a href="#" class="btn btn-ghost btn-sm">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          Favorites
+        </a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">My Tickets</a>
+      </div>
+    </div>
+
+    <nav class="header-nav" style="position:relative">
+      <div class="header-nav-inner">
+        <a href="#" class="nav-link" data-menu="sports">Sports</a>
+        <a href="#" class="nav-link" data-menu="concerts">Concerts</a>
+        <a href="#" class="nav-link" data-menu="theater">Theater</a>
+        <a href="#" class="nav-link" data-menu="festivals">Festivals</a>
+      </div>
+
+      <!-- Mega Menu -->
+      <div class="mega-menu" id="mega-menu-sports">
+        <div class="mega-menu-inner">
+          <div class="mega-menu-category">
+            <h4>Football</h4>
+            <a href="#">NFL Tickets</a>
+            <a href="#">NCAA Football Tickets</a>
+            <a href="#" class="view-all">View All Football</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Basketball</h4>
+            <a href="#">NBA Tickets</a>
+            <a href="#">NCAA Basketball Tickets</a>
+            <a href="#" class="view-all">View All Basketball</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Baseball</h4>
+            <a href="#">MLB Tickets</a>
+            <a href="#">NCAA Baseball Tickets</a>
+            <a href="#" class="view-all">View All Baseball</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>More Sports</h4>
+            <a href="#">NHL Tickets</a>
+            <a href="#">Soccer Tickets</a>
+            <a href="#">Motorsports Tickets</a>
+            <a href="#" class="view-all">View All Sports</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mega-menu" id="mega-menu-concerts">
+        <div class="mega-menu-inner">
+          <div class="mega-menu-category">
+            <h4>Genres</h4>
+            <a href="#">Pop Tickets</a>
+            <a href="#">Rock Tickets</a>
+            <a href="#">Rap & Hip-Hop Tickets</a>
+            <a href="#">Country & Folk Tickets</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>More Genres</h4>
+            <a href="#">R&B Tickets</a>
+            <a href="#">Latin Tickets</a>
+            <a href="#">Electronic Tickets</a>
+            <a href="#">Metal Tickets</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Festivals</h4>
+            <a href="#">Coachella Tickets</a>
+            <a href="#">Rolling Loud Tickets</a>
+            <a href="#">Lollapalooza Tickets</a>
+            <a href="#" class="view-all">View All Festivals</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Trending Artists</h4>
+            <a href="#">Taylor Swift Tickets</a>
+            <a href="#">Beyonce Tickets</a>
+            <a href="#">Drake Tickets</a>
+            <a href="#" class="view-all">View All Artists</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mega-menu" id="mega-menu-theater">
+        <div class="mega-menu-inner">
+          <div class="mega-menu-category">
+            <h4>Musicals</h4>
+            <a href="#">Hamilton Tickets</a>
+            <a href="#">Wicked Tickets</a>
+            <a href="#">The Lion King Tickets</a>
+            <a href="#" class="view-all">View All Musicals</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Broadway</h4>
+            <a href="#">Broadway Shows</a>
+            <a href="#">Off-Broadway</a>
+            <a href="#" class="view-all">View All Broadway</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Comedy</h4>
+            <a href="#">Stand-up Tickets</a>
+            <a href="matt-rife.html">Matt Rife Tickets</a>
+            <a href="#">Comedy Shows</a>
+            <a href="#" class="view-all">View All Comedy</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>More</h4>
+            <a href="#">Plays</a>
+            <a href="#">Opera</a>
+            <a href="#">Dance & Ballet</a>
+            <a href="#">Family Shows</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mega-menu" id="mega-menu-festivals">
+        <div class="mega-menu-inner">
+          <div class="mega-menu-category">
+            <h4>Major Festivals</h4>
+            <a href="#">Coachella</a>
+            <a href="#">Rolling Loud</a>
+            <a href="#">Lollapalooza</a>
+            <a href="#">Bonnaroo</a>
+            <a href="#" class="view-all">View All Festivals</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Electronic</h4>
+            <a href="#">EDC Las Vegas</a>
+            <a href="#">Ultra Music Festival</a>
+            <a href="#">Tomorrowland</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Country</h4>
+            <a href="#">Stagecoach</a>
+            <a href="#">CMA Fest</a>
+            <a href="#">BottleRock Napa Valley</a>
+          </div>
+          <div class="mega-menu-category">
+            <h4>Rock & Alternative</h4>
+            <a href="#">Summerfest</a>
+            <a href="#">When We Were Young</a>
+            <a href="#">Austin City Limits</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container hero-content">
+      <h1>Iconic moments start here</h1>
+      <p>Find tickets to the live events you love</p>
+      <div class="hero-search">
+        <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Search events, artists, teams and more" id="hero-search-input">
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMO BANNERS -->
+  <section class="promo-banners">
+    <div class="container">
+      <div class="promo-grid">
+        <div class="promo-card promo-card-chase">
+          <div class="promo-card-content">
+            <div class="promo-card-badge">NEW</div>
+            <h3>Big moments. Bigger rewards.</h3>
+            <p>Unlock $300 toward live entertainment with Chase Sapphire Reserve</p>
+            <button class="btn btn-white btn-sm">Learn more</button>
+          </div>
+          <div class="promo-card-image">💎</div>
+        </div>
+        <div class="promo-card promo-card-spotify">
+          <div class="promo-card-content">
+            <div class="promo-card-badge">CONNECT</div>
+            <h3>Your music library, live near you</h3>
+            <p>Connect your Spotify account and discover events from who you actually listen to</p>
+            <button class="btn btn-white btn-sm">Connect Spotify</button>
+          </div>
+          <div class="promo-card-image">🎵</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRENDING EVENTS -->
+  <section class="carousel-section" id="trending-section">
+    <div class="container">
+      <div class="carousel-header">
+        <h2>Trending events</h2>
+        <div class="carousel-nav">
+          <button class="carousel-btn" data-dir="prev" data-carousel="trending">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="carousel-btn" data-dir="next" data-carousel="trending">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="genre-filter">
+        <button class="pill active" data-filter="all">All types</button>
+        <button class="pill" data-filter="sports">Sports</button>
+        <button class="pill" data-filter="concerts">Concerts</button>
+        <button class="pill" data-filter="theater">Theater & Comedy</button>
+      </div>
+
+      <div class="carousel-track" id="trending-carousel"></div>
+    </div>
+  </section>
+
+  <!-- POPULAR EVENTS -->
+  <section class="carousel-section">
+    <div class="container">
+      <div class="carousel-header">
+        <h2>Popular events</h2>
+        <div class="carousel-nav">
+          <button class="carousel-btn" data-dir="prev" data-carousel="popular">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="carousel-btn" data-dir="next" data-carousel="popular">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+      <div class="carousel-track" id="popular-carousel"></div>
+    </div>
+  </section>
+
+  <!-- LAST MINUTE DEALS -->
+  <section class="carousel-section">
+    <div class="container">
+      <div class="carousel-header">
+        <h2>Last-minute deals</h2>
+        <div class="carousel-nav">
+          <button class="carousel-btn" data-dir="prev" data-carousel="lastminute">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="carousel-btn" data-dir="next" data-carousel="lastminute">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+      <div class="carousel-track" id="lastminute-carousel"></div>
+    </div>
+  </section>
+
+  <!-- POPULAR CATEGORIES -->
+  <section class="categories-section">
+    <div class="container">
+      <h2 class="section-title">Popular categories</h2>
+      <div class="grid grid-4 gap-300" id="categories-grid"></div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <section class="trust-strip">
+    <div class="container">
+      <h2 class="section-title text-center">Buy and sell with confidence</h2>
+      <div class="trust-grid">
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          </div>
+          <h3>World class security checks</h3>
+          <p>Every ticket is verified for validity</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+          <h3>Transparent pricing</h3>
+          <p>No hidden fees - see the full price upfront</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <h3>100% order guarantee</h3>
+          <p>Your order is backed by our FanProtect Guarantee</p>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </div>
+          <h3>Customer service all the way</h3>
+          <p>We're here to help from purchase to entry</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER + APP -->
+  <section class="newsletter-app">
+    <div class="container">
+      <div class="newsletter-app-grid">
+        <div class="newsletter-box">
+          <h3>Stay plugged in</h3>
+          <p>Get a weekly lineup of events tailored to your taste</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Subscribed!'; this.querySelector('button').disabled=true;">
+            <input type="email" class="input" placeholder="Email address" required>
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+        </div>
+        <div class="app-box">
+          <h3>Get the StubHub app</h3>
+          <p>Buy, sell, and manage your tickets with ease</p>
+          <div class="app-badges">
+            <a href="#" class="app-badge">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              App Store
+            </a>
+            <a href="#" class="app-badge">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302-2.302 2.302-2.698-2.302 2.698-2.302zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
+              Google Play
+            </a>
+          </div>
+          <div class="app-rating">
+            <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            4.8 / 5 &middot; 1.4M+ ratings
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO FAQ -->
+  <section class="seo-faq">
+    <div class="container">
+      <h2 class="section-title text-center">Frequently asked questions</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question">
+            How do I buy tickets on StubHub?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Browsing and buying on StubHub is simple. Search for the event you want to attend, choose the tickets that work best for you based on section, quantity, and price, then complete your order. You'll receive your tickets via email or in the StubHub app before the event.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            What is the FanProtect Guarantee?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>The StubHub FanProtect Guarantee ensures:</p>
+            <ul>
+              <li>Your tickets will be delivered in time for the event</li>
+              <li>Your tickets will be valid for entry</li>
+              <li>If an event is cancelled with no rescheduled date, you'll receive a 120% credit or full cash refund</li>
+              <li>You'll be taken care of from purchase to entry with our customer service</li>
+            </ul>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            How do I sell tickets on StubHub?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Selling on StubHub is easy. List your tickets by entering the event details, setting your price, and choosing your delivery method. Once your tickets sell, you'll receive payment. StubHub handles the transaction safely and securely.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            When will I receive my tickets?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Delivery timing depends on the event and the seller. Most tickets are delivered electronically and are available in your StubHub account or app well before the event. You'll receive a notification when your tickets are ready.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Can I get a refund if the event is cancelled?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Yes. If an event is cancelled with no rescheduled date, you'll receive a 120% credit of your purchase price or a full cash refund, whichever you prefer. If an event is rescheduled, your tickets will still be valid for the new date.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Will my tickets be together?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>StubHub guarantees that tickets sold as a group will be together. When you purchase multiple tickets in a single transaction, they will be in the same section and as close to each other as possible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+            <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+            <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+            <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Stub</text>
+            <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Hub</text>
+          </svg>
+        </div>
+        <p>StubHub is the world's top destination for ticket buyers and resellers. Prices may be higher or lower than face value.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+          <a href="#" aria-label="Twitter"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Newsroom</a>
+        <a href="#">Careers</a>
+        <a href="#">Investors</a>
+        <a href="#">Affiliate Program</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Contact Us</a>
+        <a href="#">My Account</a>
+        <a href="#">FanProtect Guarantee</a>
+      </div>
+      <div class="footer-col">
+        <h4>Top Cities</h4>
+        <a href="#">New York</a>
+        <a href="#">Los Angeles</a>
+        <a href="#">Chicago</a>
+        <a href="#">Las Vegas</a>
+        <a href="#">Miami</a>
+        <a href="#">Houston</a>
+      </div>
+    </div>
+
+    <div class="footer-countries">
+      <h4>StubHub around the world</h4>
+      <div class="footer-countries-list" id="countries-list"></div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2000-2026 StubHub. All Rights Reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#">User Agreement</a>
+        <a href="#">Privacy Notice</a>
+        <a href="#">Cookie Notice</a>
+        <a href="#">Your Privacy Choices</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

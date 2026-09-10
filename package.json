@@ -1,0 +1,26 @@
+{
+  "name": "stubhub-replica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static StubHub replica frontend with a Node.js + Express + SQLite checkout and Stripe payment backend.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "dev": "node --env-file-if-exists=.env server/index.js",
+    "seed": "node --env-file-if-exists=.env server/seed.js",
+    "db:reset": "node --env-file-if-exists=.env server/seed.js --reset",
+    "test": "NODE_ENV=test node --test \"test/*.test.js\""
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "stripe": "^16.9.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

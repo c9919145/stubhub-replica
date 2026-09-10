@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - StubHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+          <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Stub</text>
+          <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Hub</text>
+        </svg>
+      </a>
+      <div class="header-search">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Search events, artists, teams and more" id="header-search-input">
+      </div>
+      <div class="header-actions">
+        <a href="search.html" class="btn btn-secondary btn-sm">Sell</a>
+        <a href="tickets.html" class="btn btn-ghost btn-sm">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          Favorites
+        </a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">My Tickets</a>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <div class="header-nav-inner">
+        <a href="index.html" class="nav-link">Sports</a>
+        <a href="index.html" class="nav-link">Concerts</a>
+        <a href="index.html" class="nav-link">Theater</a>
+        <a href="index.html" class="nav-link">Festivals</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- CHECKOUT -->
+  <main class="checkout-page">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="index.html">Home</a></li>
+          <li id="crumb-event"><a href="#">Event</a></li>
+          <li aria-current="page">Checkout</li>
+        </ol>
+      </nav>
+
+      <div class="checkout-alert checkout-alert-danger hidden" id="cancel-banner" role="alert">
+        Your checkout was cancelled. No charges were made and your tickets were released. You can try again below.
+      </div>
+      <div class="checkout-alert checkout-alert-danger hidden" id="order-error" role="alert" aria-live="assertive"></div>
+      <div class="checkout-alert checkout-alert-info hidden" id="notice" role="status" aria-live="polite"></div>
+
+      <div class="checkout-shell">
+        <div class="checkout-main">
+          <div class="checkout-loading" id="checkout-loading">
+            <div class="spinner" role="status"><span class="visually-hidden">Loading event…</span></div>
+          </div>
+          <div class="checkout-loading hidden" id="checkout-error">
+            <h1>Event unavailable</h1>
+            <p id="checkout-error-text">We couldn't load this event.</p>
+            <a href="index.html" class="btn btn-primary">Back to Home</a>
+          </div>
+
+          <div class="checkout-event hidden" id="checkout-event">
+            <img id="event-image" alt="" src="" loading="lazy">
+            <div class="checkout-event-info">
+              <h1 id="event-name"></h1>
+              <p id="event-meta"></p>
+              <p id="event-available" class="availability-note"></p>
+            </div>
+          </div>
+
+          <h2 class="section-title">Select tickets</h2>
+          <div class="ticket-options" id="ticket-options"></div>
+        </div>
+
+        <aside class="order-summary" aria-label="Order summary">
+          <h2>Order summary</h2>
+          <div class="summary-lines" id="summary-lines"></div>
+          <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">$0.00</span></div>
+          <div class="summary-row"><span>Service fee &amp; taxes (10%)</span><span id="summary-fees">$0.00</span></div>
+          <div class="summary-row hidden" id="summary-gift-row"><span>Gift card</span><span id="summary-gift-amount"></span></div>
+          <div class="summary-row hidden" id="summary-remaining-row"><span>Remaining balance</span><span id="summary-remaining"></span></div>
+          <div class="summary-row summary-total"><span>Total</span><span id="summary-total">$0.00</span></div>
+
+          <div class="auth-gate hidden" id="auth-gate">
+            <h3>Sign in to continue</h3>
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" autocomplete="email" required>
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" autocomplete="current-password" required>
+            <p class="auth-error" id="auth-error" aria-live="assertive"></p>
+            <button class="btn btn-primary w-full" id="login-btn">Sign in</button>
+            <p class="auth-hint">No account? <button type="button" id="show-register" class="linklike">Create one</button></p>
+            <div class="hidden" id="register-fields">
+              <label for="register-name">Name</label>
+              <input type="text" id="register-name" autocomplete="name">
+              <button class="btn btn-secondary w-full" id="register-btn">Create account &amp; sign in</button>
+            </div>
+          </div>
+
+          <div class="payment-methods" id="payment-methods">
+            <h3>Payment method</h3>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="card" checked>
+              <span>Credit or debit card</span>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="paypal">
+              <span>PayPal</span>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="gift_card">
+              <span>StubHub gift card</span>
+            </label>
+
+            <div class="gift-card-box hidden" id="gift-card-box">
+              <div class="gift-card-input-row">
+                <input type="text" id="gift-card-code" placeholder="GC-XXXX-XXXX-XXXX-XXXX"
+                       autocomplete="off" aria-label="Gift card code">
+                <button type="button" class="btn btn-secondary btn-sm" id="apply-gift-card">Apply</button>
+              </div>
+              <p class="gift-card-msg" id="gift-card-msg" aria-live="polite"></p>
+            </div>
+
+            <div class="gift-card-applied hidden" id="gift-card-applied">
+              <p>Gift card applied: <strong id="gift-card-applied-amount"></strong></p>
+              <p class="muted">To use a different code, reload the page and start over.</p>
+            </div>
+          </div>
+
+          <p class="secure-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            Payment is processed securely by Stripe and PayPal. Card details never touch this site.
+          </p>
+          <button class="btn btn-primary btn-lg w-full" id="checkout-btn" disabled>Continue to secure checkout</button>
+          <p class="checkout-btn-note" aria-live="polite" id="checkout-btn-note"></p>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg viewBox="0 0 180 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+            <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+            <path d="M8 10h4l4 6 4-6h4v12h-3.5v-7.5L16 21l-4.5-6.5V22H8V10z" fill="white"/>
+            <text x="44" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Stub</text>
+            <text x="94" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Hub</text>
+          </svg>
+        </div>
+        <p>StubHub is the world's top destination for ticket buyers and resellers.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Newsroom</a>
+        <a href="#">Careers</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="footer-col">
+        <h4>Top Cities</h4>
+        <a href="#">New York</a>
+        <a href="#">Los Angeles</a>
+        <a href="#">Chicago</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2000-2026 StubHub. All Rights Reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#">User Agreement</a>
+        <a href="#">Privacy Notice</a>
+        <a href="#">Cookie Notice</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/checkout.js"></script>
+</body>
+</html>
