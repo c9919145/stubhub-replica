@@ -1,17 +1,21 @@
 # TicketVault Replica — Implementation Report
 
-End-to-end gift cards and PayPal support added to the existing Stripe-powered ticketing app.
-Payment now supports three instruments: card (Stripe), PayPal, and TicketVault gift cards,
-including mixed payment (gift card + remainder via card or PayPal) and full gift-card coverage.
+The existing Stripe-powered ticketing app now supports signup fix, card (Stripe), PayPal, gift cards,
+and a first-party **Customer Wallet**: balance top-up (Add Money), instant wallet checkout, and verified
+BTC/ETH crypto payments that remain PENDING until confirmed on-chain. Unavailable methods
+(USDT / Cash App / Money Order / Zelle) are displayed but disabled.
 
 ## Status
 
-- API + backend: complete, 61/61 tests passing (`npm test`).
-- Frontend: checkout payment-method UI, admin gift-card management, confirmation payment details — complete.
-- Verified: `npm run db:reset && npm start` boots and seeds 3 demo gift cards whose full
-  codes are printed to the console exactly once.
+- API + backend: complete, **76/76 tests passing** (`npm test`).
+- Frontend: customer account dashboard, Add Money top-up, checkout payment-method UI (wallet + crypto),
+  confirmation payment details — complete. Admin wallet/crypto endpoints are server-side; no admin UI tab yet.
+- Verified: `npm run db:reset && npm start` boots and seeds demo data and serves all pages.
+- **Deployment reality:** the repo deploys as static files to **GitHub Pages**, which cannot run `/api/*`.
+  Signup, wallet, and checkout only function behind a running Node server (`npm start`). See
+  *Run & deploy* below.
 
-## Schema (added in `server/db.js`)
+## Schema (in `server/db.js`)
 
 ```
 gift_cards(id, code)              -- SHA-256 of normalized code; plaintext never stored
@@ -20,8 +24,15 @@ gift_cards(id, code)              -- SHA-256 of normalized code; plaintext never
 
 gift_card_redemptions(id, order_id FK, gift_card_id FK, amount_cents, created_at)
 
+wallets(user_id PK, balance_cents, updated_at)
+
+wallet_transactions(id, user_id FK, txn_id, kind, amount_cents, method, status, reference, created_at, completed_at)
+  -- kind: deposit | order_payment | refund; method: card | btc | eth | wallet
+  -- status: pending | completed | failed; txn_id = unique 'WV-' + 12 uppercase hex chars (replay-safe idempotency)
+
 payments(id, order_id, amount_cents, provider, provider_payment_id, provider_status, event_type, created_at)
   -- one row per (provider, payment); completed captures AND pending PayPal orders get a row (idempotency)
+  -- crypto orders insert provider='crypto', status='pending', provider_order_id = order number
 
 webhook_events(id, event_id, provider, payload, created_at)
   -- dedupe ledger for Stripe + PayPal webhooks
@@ -41,7 +52,49 @@ Migration pattern: `ensureColumn(db, table, column, TEXT)` adds columns to exist
 - Cards are single-use per order; combination of multiple cards per order is intentionally not supported.
 - `active = 0` and past `expires_at` reject application.
 
+## Wallet & crypto rules
+
+- Balance lives in the DB (`wallets.balance_cents`) and is only ever moved via atomic
+  `BEGIN IMMEDIATE` transactions (`server/wallet.js`). No negative balances, no duplicate credits.
+- A user's wallet is credited **only after** a payment is verified by the server:
+  - **Card top-up** → funds credit on the Stripe `checkout.session.completed` webhook.
+  - **BTC/ETH top-up** → deposit stays `pending`; an admin confirms it on-chain
+    (`POST /api/admin/wallet/deposits/:txnId/confirm`) and only then is the balance credited.
+    No customer-facing action credits crypto.
+- Deposits are `$1.00`–`$50,000.00` (`MIN/MAX_DEPOSIT_CENTS`). Available deposit methods:
+  `card`, `btc`, `eth`. USDT / Cash App / Money Order / Zelle → `409 METHOD_UNAVAILABLE`.
+- Crypto **orders** are recorded `pending` with the on-chain address; they complete only via
+  `POST /api/admin/orders/:orderNumber/crypto/complete` (never by a customer click).
+- Chain addresses and QR images are provided by `wallet.cryptoInfo(config, m)` from
+  `WALLET_ADDRESS_BTC` / `WALLET_ADDRESS_ETH` (assets: `assets/images/qr-btc.png` / `qr-eth.png`).
+- Refunds of wallet-paid orders restore the wallet balance (`kind='refund'`, idempotent per reference).
+
 ## API surface
+
+Wallet:
+
+- `GET /api/wallet` — `{ wallet: { balanceCents, transactions[] } }` (last 100 txns).
+- `POST /api/wallet/deposits` — `{ amountCents, method }`. Card → `{ checkoutUrl }` (Stripe session);
+  BTC/ETH → `{ txnId, status: 'pending', payment: { network, address, qrImage }, requiresVerification }`.
+- `POST /api/orders/wallet` — `{ eventId, items }` → instant debit; returns `{ order, idempotent }`
+  with `order.status === 'paid'`. Errors: `INSUFFICIENT_WALLET_BALANCE`, `PAYMENT_ALREADY_STARTED`,
+  `GIFT_CARD_COVERS_ORDER`.
+- `POST /api/orders/crypto` — `{ eventId, items, method: 'btc'|'eth' }` → pending crypto payment
+  (`provider='crypto'`, `provider_order_id` = order number). Returns the address to pay.
+
+Webhooks (idempotent via `webhook_events`):
+
+- `POST /webhook/stripe` — existing card checkout; wallet top-ups now settle on
+  `checkout.session.completed` (credits the wallet) and fail on expired/payment-failed/canceled events.
+
+Admin (wallet / crypto):
+
+- `GET /api/admin/wallet/deposits` — pending deposits awaiting confirmation (with raw totals).
+- `POST /api/admin/wallet/deposits/:txnId/confirm` — `{ outcome: 'completed' | 'failed' }` →
+  credits/fails the deposit (idempotent; `TXN_ALREADY_USED` handling).
+- `GET /api/admin/wallet/transactions`, `POST /api/admin/orders/:orderNumber/crypto/complete`.
+- Order refunds: wallet-paid orders restore wallet balance; crypto orders → `409 CRYPTO_REFUND_MANUAL`
+  (refund the chain payment manually, then void the order).
 
 Checkout / payment:
 
@@ -76,14 +129,22 @@ Admin:
 
 ## Frontend
 
-- `checkout.html` / `js/checkout.js` / `css/checkout.css` — payment method radios
-  (card / PayPal / gift card), gift-code entry + apply, applied-amount + remaining-balance summary
-  rows, and dynamic button labels (Continue with PayPal / Pay remaining with card / Place order).
-  Gift-card-only orders skip the gateway and land straight on the confirmation page.
-- `admin.html` / `js/admin.js` / `css/admin.css` — Orders / Gift cards tabs; create cards
-  (codes shown once), activate/deactivate, view redemption history; order table shows method/gift info.
-- `confirmation.js` — payment details block: method, gift-card amount, amount paid via provider,
-  reference, refunded / gift-card-only notes.
+- `membership.html` — inline field validation, API error mapping (`EMAIL_TAKEN` → "already exists"),
+  8+ char password + match + terms; success redirects to `account.html` (session cookie already set).
+- `account.html` / `js/account.js` / `css/wallet.css` — customer dashboard: wallet balance,
+  transaction history, order history, sign-out; mobile responsive.
+- `add-money.html` / `js/add-money.js` — top-up flow: amount presets + custom, method radios
+  (card / btc / eth; others disabled), card → Stripe redirect, BTC/ETH → PENDING panel
+  (network, address, QR, copy button) explaining the credit comes only after confirmation.
+- `checkout.html` / `js/checkout.js` — payment-method radios: Credit Card, Wallet Balance
+  (shows balance + amount to pay, instant `POST /api/orders/wallet`), BTC, PayPal, Gift card,
+  and USDT / Cash App / Money Order / Zelle shown as **Currently unavailable** (disabled).
+  BTC/ETH selection shows the address/QR panel and records the payment as pending (no success redirect).
+- `confirmation.js` — labels Wallet balance / BTC / ETH payments; crypto-pending orders show a note
+  that completion follows on-chain confirmation.
+- `admin.html` / `js/admin.js` / `css/admin.css` — Orders / Gift cards tabs (existing).
+  Admin wallet/crypto confirmation endpoints exist on the server only; no admin UI tab yet.
+- Existing card/PayPal checkout UI and gift-card flows are unchanged.
 
 ## Environment variables
 
@@ -95,6 +156,24 @@ Admin:
 | `PAYPAL_WEBHOOK_ID` | PayPal webhook ID, for signature verification |
 | `PAYPAL_MERCHANT_EMAIL` | optional seller PayPal email → `purchase_units[].payee` |
 | `GIFT_CARD_DEFAULT_LIFE_DAYS` | gift card validity, default 365 |
+| `WALLET_ADDRESS_BTC` / `WALLET_ADDRESS_ETH` | wallet addresses shown on the payment-methods page, QR codes, and crypto orders |
+
+## Run & deploy (read this)
+
+Full functionality (signup, wallet, checkout, webhooks) requires the Node server —
+**GitHub Pages alone cannot run any `/api/*` endpoint.**
+
+1. `cd` into the project; `npm install`.
+2. Copy `.env.example` → `.env` and set real values (Stripe, PayPal, wallet addresses).
+3. `npm run db:reset` (fresh demo data, prints demo gift-card codes once) then `npm start` →
+   serves the app on http://localhost:3000.
+4. Point Stripe (and PayPal) webhooks at `https://<your-host>/webhook/stripe` and `/webhook/paypal`.
+   For local testing, expose the port with a tunnel and put that URL in the dashboard.
+5. Crypto flow needs a human step: confirm the on-chain deposit/order via the admin endpoints.
+6. `npm test` runs the full suite (76 tests) in a throwaway in-memory DB.
+
+For the hosted demo, replace real Stripe keys with placeholder values so the static site can't
+move money, and always keep card numbers/CVVs out of the codebase.
 
 ## PayPal sandbox setup
 
@@ -109,12 +188,14 @@ Admin:
 
 `npm run db:reset` / first boot seeds 3 × $500 gift cards; full codes print to the console once.
 Re-seeding is idempotent (skips when cards already exist). Default admin: `admin@ticketvault.test` / `adminpass123`,
-customer: `customer@ticketvault.test` / `password123`.
+customer: `customer@ticketvault.test` / `password123`. Wallets start at $0; top up via `/api/wallet/deposits`
+(card → test-mode Stripe, or BTC/ETH → confirm via admin after "sending").
 
 ## Notes & security
 
 - All monetary values are integer cents internally; fees fixed at `FEE_RATE` (0.10).
-- Idempotency everywhere: payment row per provider, webhook dedupe, gift-card/complete idempotent returns.
-- No secrets logged; a rate limiter wraps gift-card endpoints.
+- Idempotency everywhere: payment row per provider, webhook dedupe, gift-card/complete idempotent returns,
+  wallet txns keyed by unique `WV-` ids, crypto orders re-keyed by pending payment row.
+- No secrets logged; rate limiters wrap auth, wallet deposits, order, and admin endpoints.
 - Node quirk: this project's Node v24.21.0 build rejects `as` in destructuring — alias imports are
   done via an extra `require`, not `{ x as y }`.
