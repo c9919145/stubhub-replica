@@ -132,7 +132,9 @@ Admin:
 - `membership.html` — inline field validation, API error mapping (`EMAIL_TAKEN` → "already exists"),
   8+ char password + match + terms; success redirects to `account.html` (session cookie already set).
 - `account.html` / `js/account.js` / `css/wallet.css` — customer dashboard: wallet balance,
-  transaction history, order history, sign-out; mobile responsive.
+  transaction history, order history, sign-out; mobile responsive. When signed out it shows a
+  **sign-in form** (`POST /api/auth/login`) with inline validation and error display, so a
+  customer can log back in after logout and reach the dashboard again.
 - `add-money.html` / `js/add-money.js` — top-up flow: amount presets + custom, method radios
   (card / btc / eth; others disabled), card → Stripe redirect, BTC/ETH → PENDING panel
   (network, address, QR, copy button) explaining the credit comes only after confirmation.

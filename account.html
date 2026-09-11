@@ -39,7 +39,27 @@
       <p id="account-greeting">Loading your account…</p>
     </section>
 
-    <section class="account-grid">
+    <section class="card signin-panel hidden" id="signin-panel" style="max-width: 480px; margin: 0 auto 48px; padding: 32px;">
+      <h2>Sign In</h2>
+      <p class="muted" style="margin: 6px 0 20px;">Sign in to view your wallet, transactions, and orders.</p>
+      <form id="signin-form" novalidate style="display: grid; gap: 16px;">
+        <div class="input-group" data-field="email">
+          <label for="si-email" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Email</label>
+          <input type="email" id="si-email" name="email" autocomplete="email" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+          <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
+        </div>
+        <div class="input-group" data-field="password">
+          <label for="si-password" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Password</label>
+          <input type="password" id="si-password" name="password" autocomplete="current-password" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+          <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
+        </div>
+        <div id="si-error" class="form-alert hidden" role="alert"></div>
+        <button type="submit" id="si-submit" class="btn btn-primary btn-lg" style="width: 100%; padding: 14px; font-size: 16px; background: #5e29ba; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Sign In</button>
+        <p style="text-align: center; font-size: 14px; color: #666; margin: 0;">New here? <a href="membership.html" style="color: #5e29ba;">Create a free account</a></p>
+      </form>
+    </section>
+
+    <section id="account-grid" class="account-grid">
 
       <div class="card wallet-card">
         <div class="card-title-row">
@@ -111,5 +131,9 @@
   </footer>
 
   <script src="js/account.js"></script>
+  <style>
+    .field-error { display: block; margin-top: 4px; }
+    .input-group.has-error input { border-color: #c62828 !important; }
+  </style>
 </body>
 </html>

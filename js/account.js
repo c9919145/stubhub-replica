@@ -5,6 +5,13 @@
 
   const els = {
     greeting: document.getElementById('account-greeting'),
+    grid: document.getElementById('account-grid'),
+    signinPanel: document.getElementById('signin-panel'),
+    signinForm: document.getElementById('signin-form'),
+    siEmail: document.getElementById('si-email'),
+    siPassword: document.getElementById('si-password'),
+    siSubmit: document.getElementById('si-submit'),
+    siError: document.getElementById('si-error'),
     balance: document.getElementById('wallet-balance'),
     txnCard: document.getElementById('transactions-card'),
     txnList: document.getElementById('transactions-list'),
@@ -103,22 +110,62 @@
     els.orders.appendChild(list);
   }
 
+  function setFieldError(group, message) {
+    const input = group && group.querySelector('input, select, textarea');
+    if (input) input.style.borderColor = message ? '#c62828' : '';
+    const small = group && group.querySelector('.field-error');
+    if (small) small.textContent = message || '';
+  }
+
+  function showSigninError(message) {
+    els.siError.textContent = message || '';
+    els.siError.classList.toggle('hidden', !message);
+  }
+
+  els.signinForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (els.siEmail.value || '').trim();
+    const password = els.siPassword.value || '';
+    let valid = true;
+
+    setFieldError(els.siEmail.closest('.input-group'), '');
+    setFieldError(els.siPassword.closest('.input-group'), '');
+    showSigninError('');
+
+    if (!email) { setFieldError(els.siEmail.closest('.input-group'), 'Email is required.'); valid = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setFieldError(els.siEmail.closest('.input-group'), 'Enter a valid email address.'); valid = false; }
+    if (!password) { setFieldError(els.siPassword.closest('.input-group'), 'Password is required.'); valid = false; }
+    if (!valid) return;
+
+    els.siSubmit.disabled = true;
+    els.siSubmit.textContent = 'Signing In…';
+    try {
+      const { res, body } = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+      if (res.ok) {
+        window.location.href = 'account.html';
+        return;
+      }
+      showSigninError((body && body.error) || 'Invalid email or password.');
+    } catch (err) {
+      showSigninError('Could not reach the server. Make sure the application is running, then try again.');
+    }
+    els.siSubmit.disabled = false;
+    els.siSubmit.textContent = 'Sign In';
+  });
+
   async function loadAccount() {
     const { res: authRes, body: authBody } = await api('/api/auth/me');
     if (authRes.status === 401) {
-      els.greeting.textContent = 'You are not signed in.';
-      els.balance.textContent = '—';
-      els.balance.closest('.wallet-card').innerHTML +=
-        '<p class="muted">Sign in to view your wallet and orders.</p>';
-      els.txnList.innerHTML = '<p class="muted">Not available.</p>';
-      els.orders.innerHTML = '<p class="muted">Not available.</p>';
+      els.greeting.textContent = 'Please sign in to view your account.';
+      els.grid.classList.add('hidden');
+      els.signinPanel.classList.remove('hidden');
       els.logout.classList.add('hidden');
       return;
     }
     if (authRes.ok && authBody && authBody.user) {
       const user = authBody.user;
       const name = (user.name || (user.email ? user.email.split('@')[0] : 'there')).split(' ')[0];
-      els.greeting.textContent = 'Welcome back, ' + name + '.';
+      els.greeting.textContent = params.get('welcome') ? 'Welcome to TicketVault, ' + name + '!' : 'Welcome back, ' + name + '.';
     }
 
     const [walletRes, ordersRes] = await Promise.all([
