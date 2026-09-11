@@ -20,7 +20,7 @@ test('concurrent reservations cannot oversell the last ticket', async (t) => {
   const tt = evt.body.ticketTypes[0];
   app.db.prepare('UPDATE ticket_types SET total_quantity = 1, sold_quantity = 0, reserved_quantity = 0 WHERE id = ?').run(tt.id);
 
-  const customer = app.db.prepare('SELECT id, email FROM users WHERE email = ?').get('customer@stubhub.test');
+  const customer = app.db.prepare('SELECT id, email FROM users WHERE email = ?').get('customer@ticketvault.test');
 
   const runWorker = () => new Promise((resolve) => {
     const w = new Worker(WORKER, {
@@ -64,12 +64,12 @@ test('concurrent gift card applies cannot overspend a card', async (t) => {
   const price = app.db.prepare('SELECT price_cents FROM ticket_types WHERE id = ?').get(tt.id).price_cents;
   const feeRate = app.config.feeRate;
   const total = price + Math.round(price * feeRate);
-  const adminLogin = await (await app.app.post('/api/auth/login').send({ email: 'admin@stubhub.test', password: 'adminpass123' }));
+  const adminLogin = await (await app.app.post('/api/auth/login').send({ email: 'admin@ticketvault.test', password: 'adminpass123' }));
   const admin = adminLogin.headers['set-cookie'][0].split(';')[0];
   const gc = await app.app.post('/api/admin/gift-cards').set('Cookie', admin).send({ valueCents: total, count: 1 });
   const code = gc.body.codes[0];
 
-  const customer = app.db.prepare('SELECT id, email FROM users WHERE email = ?').get('customer@stubhub.test');
+  const customer = app.db.prepare('SELECT id, email FROM users WHERE email = ?').get('customer@ticketvault.test');
 
   const runWorker = () => new Promise((resolve) => {
     const w = new Worker(GIFT_WORKER, {

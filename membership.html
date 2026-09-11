@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membership - TicketVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Vault</text>
+        </svg>
+      </a>
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+        <a href="payment-methods.html" class="btn btn-ghost btn-sm">Payment Methods</a>
+        <a href="membership.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" style="background: linear-gradient(135deg, #1b0045 0%, #5e29ba 100%); padding: 80px 24px; color: white; text-align: center;">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <h1 style="font-size: 40px; font-weight: 800; margin-bottom: 12px;">Join TicketVault</h1>
+        <p style="font-size: 18px; opacity: 0.9;">Create your free account to buy and sell tickets.</p>
+      </div>
+    </section>
+
+    <section style="max-width: 560px; margin: 0 auto; padding: 48px 24px;">
+      <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+        <form id="register-form" style="max-width: 480px; margin: 0 auto;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="input-group">
+              <label for="firstName" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">First Name</label>
+              <input type="text" id="firstName" name="firstName" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            </div>
+            <div class="input-group">
+              <label for="lastName" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Last Name</label>
+              <input type="text" id="lastName" name="lastName" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            </div>
+          </div>
+          <div class="input-group" style="margin-bottom: 16px;">
+            <label for="email" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Email</label>
+            <input type="email" id="email" name="email" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+          </div>
+          <div class="input-group" style="margin-bottom: 16px;">
+            <label for="password" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Password</label>
+            <input type="password" id="password" name="password" required minlength="8" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <small style="color: #666; font-size: 12px;">Minimum 8 characters</small>
+          </div>
+          <div class="input-group" style="margin-bottom: 16px;">
+            <label for="confirmPassword" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+          </div>
+          <div style="margin-bottom: 24px;">
+            <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="terms" required style="margin-top: 4px;">
+              <span style="font-size: 14px; color: #666;">I agree to the <a href="#" style="color: #5e29ba;">Terms and Conditions</a> and <a href="#" style="color: #5e29ba;">Privacy Policy</a></span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; padding: 14px; font-size: 16px; background: #5e29ba; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Create Account</button>
+          <p style="text-align: center; margin-top: 16px; color: #666; font-size: 14px;">Already have an account? <a href="tickets.html" style="color: #5e29ba;">Sign in</a></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="rgba(255,255,255,0.15)"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="rgba(255,255,255,0.85)">Vault</text>
+        </svg>
+        <p>TicketVault is your independent destination for buying and selling event tickets.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="customer-service.html">Customer Service</a>
+        <a href="payment-methods.html">Payment Methods</a>
+        <a href="membership.html">Membership</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="index.html">Home</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 TicketVault. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <style>
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 28px !important; }
+      #register-form .input-group { grid-column: 1 / -1; }
+      #register-form > div:first-child { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script>
+  document.getElementById('register-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    var password = document.getElementById('password').value;
+    var confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 8) {
+      alert('Password must be at least 8 characters');
+      return;
+    }
+
+    var formData = {
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+      email: document.getElementById('email').value,
+      password: password
+    };
+
+    try {
+      var response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      var data = await response.json();
+
+      if (response.ok) {
+        alert('Account created successfully! Please sign in.');
+        window.location.href = 'tickets.html';
+      } else {
+        alert(data.error || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      alert('Network error. Please try again.');
+    }
+  });
+  </script>
+</body>
+</html>

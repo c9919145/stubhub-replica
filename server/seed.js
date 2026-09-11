@@ -16,7 +16,7 @@ const TIERS = [
   { name: 'VIP', description: 'VIP package: best seats + priority entry.', multiplier: 2.4, quantity: 30 }
 ];
 
-const DEMO_CUSTOMER = { email: 'customer@stubhub.test', password: 'password123', name: 'Alex Johnson' };
+const DEMO_CUSTOMER = { email: 'customer@ticketvault.test', password: 'password123', name: 'Alex Johnson' };
 
 function resetDb(dbPath) {
   if (dbPath === ':memory:') {

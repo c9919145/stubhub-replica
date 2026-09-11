@@ -10,7 +10,7 @@ async function cookieFor(app, email, password) {
   return res.headers['set-cookie'][0].split(';')[0];
 }
 
-const CUSTOMER = ['customer@stubhub.test', 'password123'];
+const CUSTOMER = ['customer@ticketvault.test', 'password123'];
 
 /** Creates a PayPal order via the API and returns { orderNumber, tt, order }. */
 async function paypalOrder(app, cookie, eventId = 70103, quantity = 1) {
@@ -64,7 +64,7 @@ test('POST /api/orders/paypal creates a PayPal order and records it', async (t) 
   const customer = await cookieFor(app, ...CUSTOMER);
   const { orderNumber, approveUrl, tt, order } = await paypalOrder(app, customer);
 
-  assert.match(approveUrl, /https:\/\/paypal\.stubhub\.test\/approve\/1/);
+  assert.match(approveUrl, /https:\/\/paypal\.ticketvault\.test\/approve\/1/);
   assert.equal(order.payment_method, 'paypal');
 
   const payment = app.db.prepare("SELECT * FROM payments WHERE order_id = ? AND provider = 'paypal'").get(order.id);
@@ -188,7 +188,7 @@ test('paying the remainder after a gift card with PayPal', async (t) => {
 
   const pp = await app.app.post(`/api/orders/${orderNumber}/pay-remaining/paypal`).set('Cookie', customer);
   assert.equal(pp.status, 200);
-  assert.equal(pp.body.approveUrl, 'https://paypal.stubhub.test/approve/1');
+  assert.equal(pp.body.approveUrl, 'https://paypal.ticketvault.test/approve/1');
 
   const created = app.paypal._created[0];
   assert.equal(created.orderNumber, orderNumber);

@@ -10,7 +10,7 @@ async function cookieFor(app, email, password) {
   return res.headers['set-cookie'][0].split(';')[0];
 }
 
-const CUSTOMER = ['customer@stubhub.test', 'password123'];
+const CUSTOMER = ['customer@ticketvault.test', 'password123'];
 
 async function adminCreateCard(app, valueCents, count = 1) {
   const admin = await cookieFor(app, ADMIN_EMAIL, ADMIN_PASSWORD);
@@ -186,7 +186,7 @@ test('a partially covered order pays the remainder by card', async (t) => {
 
   const pay = await app.app.post(`/api/orders/${buy.body.orderNumber}/pay-remaining/card`).set('Cookie', customer);
   assert.equal(pay.status, 200);
-  assert.match(pay.body.checkoutUrl, /https:\/\/pay\.stubhub\.test\/c\/\d+/);
+  assert.match(pay.body.checkoutUrl, /https:\/\/pay\.ticketvault\.test\/c\/\d+/);
   const captured = app.stripe._created;
   const session = [...captured].reverse().find(s => s.client_reference_id === buy.body.orderNumber);
   assert.equal(session.line_items.length, 1);

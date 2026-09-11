@@ -99,14 +99,14 @@ class PayPalClient {
       purchase_units: [{
         reference_id: 'default',
         custom_id: orderNumber,
-        description: `StubHub order ${orderNumber}`,
+        description: `TicketVault order ${orderNumber}`,
         amount: {
           currency_code: 'USD',
           value: centsToDollars(amountCents)
         }
       }],
       application_context: {
-        brand_name: 'StubHub',
+        brand_name: 'TicketVault',
         locale: 'en-US',
         landing_page: 'BILLING',
         user_action: 'PAY_NOW',

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Methods - TicketVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <header class="header" id="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Vault</text>
+        </svg>
+      </a>
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+        <a href="payment-methods.html" class="btn btn-ghost btn-sm">Payment Methods</a>
+        <a href="membership.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" style="background: linear-gradient(135deg, #1b0045 0%, #5e29ba 100%); padding: 80px 24px; color: white; text-align: center;">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <h1 style="font-size: 40px; font-weight: 800; margin-bottom: 12px;">Payment Methods</h1>
+        <p style="font-size: 18px; opacity: 0.9;">Simple, secure ways to pay and get paid.</p>
+      </div>
+    </section>
+
+    <section style="max-width: 1000px; margin: 0 auto; padding: 48px 24px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 16px;">🪙</div>
+          <h3 style="font-size: 20px; margin-bottom: 8px; color: #1b0045;">BTC / USDT</h3>
+          <p style="color: #999; font-size: 14px; margin-bottom: 16px;">Bitcoin &amp; Tether on the Bitcoin network</p>
+          <div style="background: #f5f0ff; border-radius: 8px; padding: 12px; margin-bottom: 16px; word-break: break-all; font-size: 13px; color: #1b0045;">bc1q82haxrn0a0utrm3usnq7ajecumvqzk453v54vu</div>
+          <div style="width: 200px; height: 200px; margin: 0 auto 16px; border: 2px dashed #d0d6db; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #99a5ad; font-size: 14px; font-weight: 600;">QR Code</div>
+          <button type="button" class="btn btn-primary" onclick="copyAddress('bc1q82haxrn0a0utrm3usnq7ajecumvqzk453v54vu')">Copy Address</button>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 16px;">🔷</div>
+          <h3 style="font-size: 20px; margin-bottom: 8px; color: #1b0045;">Ethereum (ETH/USDT)</h3>
+          <p style="color: #999; font-size: 14px; margin-bottom: 16px;">Ethereum network (ERC-20)</p>
+          <div style="background: #f5f0ff; border-radius: 8px; padding: 12px; margin-bottom: 16px; word-break: break-all; font-size: 13px; color: #1b0045;">0x814Bb1edC49Cebb9f592556333Ae3d5A626f7a60</div>
+          <div style="width: 200px; height: 200px; margin: 0 auto 16px; border: 2px dashed #d0d6db; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #99a5ad; font-size: 14px; font-weight: 600;">QR Code</div>
+          <button type="button" class="btn btn-primary" onclick="copyAddress('0x814Bb1edC49Cebb9f592556333Ae3d5A626f7a60')">Copy Address</button>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 16px;">📱</div>
+          <h3 style="font-size: 20px; margin-bottom: 8px; color: #1b0045;">Cash App</h3>
+          <p style="color: #999; font-size: 14px; margin-bottom: 16px;">Pay with your Cash App balance</p>
+          <div style="background: #f5f0ff; border-radius: 8px; padding: 16px; color: #5a6a75; font-size: 14px;">Contact support for Cash App details</div>
+          <p style="color: #666; font-size: 14px; margin-top: 16px;">Need help? <a href="customer-service.html" style="color: #5e29ba;">Reach out</a> during business hours.</p>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 16px;">🎁</div>
+          <h3 style="font-size: 20px; margin-bottom: 8px; color: #1b0045;">Gift Card</h3>
+          <p style="color: #999; font-size: 14px; margin-bottom: 16px;">Use a store gift card</p>
+          <div style="background: #f5f0ff; border-radius: 8px; padding: 16px; color: #5a6a75; font-size: 14px;">Enter your gift card code at checkout</div>
+          <p style="color: #666; font-size: 14px; margin-top: 16px;">Need help? <a href="customer-service.html" style="color: #5e29ba;">Reach out</a> during business hours.</p>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 16px;">💵</div>
+          <h3 style="font-size: 20px; margin-bottom: 8px; color: #1b0045;">Money Order</h3>
+          <p style="color: #999; font-size: 14px; margin-bottom: 16px;">Pay with a money order</p>
+          <div style="background: #f5f0ff; border-radius: 8px; padding: 16px; color: #5a6a75; font-size: 14px;">Contact support for mailing details</div>
+          <p style="color: #666; font-size: 14px; margin-top: 16px;">Need help? <a href="customer-service.html" style="color: #5e29ba;">Reach out</a> during business hours.</p>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 16px;">🏦</div>
+          <h3 style="font-size: 20px; margin-bottom: 8px; color: #1b0045;">Bank Transfer / Zelle</h3>
+          <p style="color: #999; font-size: 14px; margin-bottom: 16px;">Transfer directly from your bank</p>
+          <div style="background: #f5f0ff; border-radius: 8px; padding: 16px; color: #5a6a75; font-size: 14px;">Contact support for Zelle details</div>
+          <p style="color: #666; font-size: 14px; margin-top: 16px;">Need help? <a href="customer-service.html" style="color: #5e29ba;">Reach out</a> during business hours.</p>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 16px;">💳</div>
+          <h3 style="font-size: 20px; margin-bottom: 8px; color: #1b0045;">Credit Card</h3>
+          <p style="color: #999; font-size: 14px; margin-bottom: 16px;">Pay with Visa, Mastercard, and more</p>
+          <div style="background: #f5f0ff; border-radius: 8px; padding: 16px; color: #5a6a75; font-size: 14px;">Secure checkout powered by Stripe</div>
+          <p style="color: #666; font-size: 14px; margin-top: 16px;">Need help? <a href="customer-service.html" style="color: #5e29ba;">Reach out</a> during business hours.</p>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="rgba(255,255,255,0.15)"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="rgba(255,255,255,0.85)">Vault</text>
+        </svg>
+        <p>TicketVault is your independent destination for buying and selling event tickets.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="customer-service.html">Customer Service</a>
+        <a href="payment-methods.html">Payment Methods</a>
+        <a href="membership.html">Membership</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="index.html">Home</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 TicketVault. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+  function copyAddress(address) {
+    navigator.clipboard.writeText(address).then(function() {
+      alert('Address copied to clipboard!');
+    }).catch(function() {
+      // Fallback
+      var textarea = document.createElement('textarea');
+      textarea.value = address;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('Address copied to clipboard!');
+    });
+  }
+  </script>
+</body>
+</html>

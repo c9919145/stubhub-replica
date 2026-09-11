@@ -8,7 +8,7 @@ This repo is a static site (all HTML/CSS/JS in the root), so it deploys to GitHu
    ```sh
    git init
    git add .
-   git commit -m "StubHub replica static site"
+    git commit -m "TicketVault"
    git branch -M main
    git remote add origin https://github.com/<YOUR_USERNAME>/<REPO>.git
    git push -u origin main

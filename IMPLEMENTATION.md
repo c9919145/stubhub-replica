@@ -1,7 +1,7 @@
-# StubHub Replica — Implementation Report
+# TicketVault Replica — Implementation Report
 
 End-to-end gift cards and PayPal support added to the existing Stripe-powered ticketing app.
-Payment now supports three instruments: card (Stripe), PayPal, and StubHub gift cards,
+Payment now supports three instruments: card (Stripe), PayPal, and TicketVault gift cards,
 including mixed payment (gift card + remainder via card or PayPal) and full gift-card coverage.
 
 ## Status
@@ -108,8 +108,8 @@ Admin:
 ## Demo data
 
 `npm run db:reset` / first boot seeds 3 × $500 gift cards; full codes print to the console once.
-Re-seeding is idempotent (skips when cards already exist). Default admin: `admin@stubhub.test` / `adminpass123`,
-customer: `customer@stubhub.test` / `password123`.
+Re-seeding is idempotent (skips when cards already exist). Default admin: `admin@ticketvault.test` / `adminpass123`,
+customer: `customer@ticketvault.test` / `password123`.
 
 ## Notes & security
 

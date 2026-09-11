@@ -41,7 +41,7 @@ function loadConfig(overrides = {}) {
     paypalWebhookId: env.PAYPAL_WEBHOOK_ID || '',
     paypalMerchantEmail: env.PAYPAL_MERCHANT_EMAIL || '',
     giftCardDefaultLifeDays: Number(env.GIFT_CARD_DEFAULT_LIFE_DAYS || 365),
-    adminEmail: env.ADMIN_EMAIL || 'admin@stubhub.test',
+    adminEmail: env.ADMIN_EMAIL || 'admin@ticketvault.test',
     adminPassword: env.ADMIN_PASSWORD || 'adminpass123'
   };
 

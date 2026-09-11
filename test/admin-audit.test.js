@@ -16,7 +16,7 @@ test('audit log endpoint requires admin access', async (t) => {
 
   assert.equal((await app.app.get('/api/admin/audit')).status, 401);
 
-  const customer = await loginAs(app, 'customer@stubhub.test', 'password123');
+  const customer = await loginAs(app, 'customer@ticketvault.test', 'password123');
   const asCustomer = await app.app.get('/api/admin/audit').set('Cookie', customer);
   assert.equal(asCustomer.status, 403);
 });
@@ -45,7 +45,7 @@ test('refund and gift card admin actions are audited', async (t) => {
   const admin = await loginAs(app, ADMIN_EMAIL, ADMIN_PASSWORD);
 
   // Create a paid order, then refund it.
-  const custRes = await login(app, 'customer@stubhub.test', 'password123');
+  const custRes = await login(app, 'customer@ticketvault.test', 'password123');
   const customer = custRes.headers['set-cookie'][0].split(';')[0];
   const std = await ticketTypeId(app, 70103, 'Standard');
   const created = await app.app.post('/api/orders').set('Cookie', customer)

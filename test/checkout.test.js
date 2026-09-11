@@ -31,7 +31,7 @@ test('creating an order reserves inventory and returns a checkout URL', async (t
 
   assert.equal(res.status, 200);
   assert.ok(res.body.orderNumber.startsWith('SH-'));
-  assert.ok(res.body.checkoutUrl.includes('pay.stubhub.test'));
+  assert.ok(res.body.checkoutUrl.includes('pay.ticketvault.test'));
 
   const evt = await app.app.get('/api/events/70103');
   const standard = evt.body.ticketTypes.find(x => x.name === 'Standard');

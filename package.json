@@ -1,8 +1,8 @@
 {
-  "name": "stubhub-replica",
+  "name": "ticketvault",
   "version": "1.0.0",
   "private": true,
-  "description": "Static StubHub replica frontend with a Node.js + Express + SQLite checkout and Stripe payment backend.",
+  "description": "TicketVault - Independent ticket marketplace with Node.js backend",
   "type": "commonjs",
   "scripts": {
     "start": "node --env-file-if-exists=.env server/index.js",

@@ -11,9 +11,9 @@ const { createApp } = require('../server/app');
 const seed = require('../server/seed');
 const supertest = require('supertest');
 
-const ADMIN_EMAIL = 'admin@stubhub.test';
+const ADMIN_EMAIL = 'admin@ticketvault.test';
 const ADMIN_PASSWORD = 'adminpass123';
-const CUSTOMER_EMAIL = 'customer@stubhub.test';
+const CUSTOMER_EMAIL = 'customer@ticketvault.test';
 const CUSTOMER_PASSWORD = 'password123';
 const MOCK_WEBHOOK_SECRET = 'whsec_test_secret';
 
@@ -24,7 +24,7 @@ function cleanupDbFiles(dbPath) {
 }
 
 function createTestApp(opts = {}) {
-  const dbPath = path.join(os.tmpdir(), `stubhub-test-${process.pid}-${crypto.randomBytes(6).toString('hex')}.db`);
+  const dbPath = path.join(os.tmpdir(), `ticketvault-test-${process.pid}-${crypto.randomBytes(6).toString('hex')}.db`);
   const config = loadConfig({
     NODE_ENV: 'test',
     DB_PATH: dbPath,
@@ -78,7 +78,7 @@ function createStripeMock(opts = {}) {
           counter += 1;
           created.push(params);
           if (opts.sessionCreate) return opts.sessionCreate(params, counter);
-          return { id: `cs_test_${counter}`, url: `https://pay.stubhub.test/c/${counter}` };
+          return { id: `cs_test_${counter}`, url: `https://pay.ticketvault.test/c/${counter}` };
         }
       }
     },
@@ -117,7 +117,7 @@ function createPayPalMock(opts = {}) {
       orderCounter += 1;
       created.push(params);
       if (opts.createOrder) return opts.createOrder(params, orderCounter);
-      return { id: `PAY-${orderCounter}`, status: 'CREATED', approveUrl: `https://paypal.stubhub.test/approve/${orderCounter}` };
+      return { id: `PAY-${orderCounter}`, status: 'CREATED', approveUrl: `https://paypal.ticketvault.test/approve/${orderCounter}` };
     },
     captureOrder: async (orderId) => {
       captureCounter += 1;

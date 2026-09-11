@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Populate event info
-  document.title = `${event.name} - StubHub`;
+  document.title = `${event.name} - TicketVault`;
   document.getElementById('event-image').src = event.image;
   document.getElementById('event-image').alt = event.name;
   document.getElementById('event-name').textContent = event.name;
