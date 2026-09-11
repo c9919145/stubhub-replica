@@ -13,9 +13,9 @@ const db = initDb(config.dbPath);
 
 if (db.prepare('SELECT COUNT(*) AS c FROM events').get().c === 0) {
   seed.seedEvents(db);
-  seed.seedUsers(db, config);
   seed.seedGiftCards(db, config);
 }
+seed.seedUsers(db, config); // idempotent upsert: always ensure the demo admin/customer exist
 
 const stripe = payments.createStripeClient(config.stripeSecretKey);
 const paypal = new paypalModule.PayPalClient(config);

@@ -41,6 +41,7 @@
       <nav class="admin-tabs" id="admin-tabs" aria-label="Admin sections">
         <button type="button" class="admin-tab is-active" data-tab="orders" id="tab-orders-btn">Orders</button>
         <button type="button" class="admin-tab" data-tab="giftcards" id="tab-giftcards-btn">Gift cards</button>
+        <button type="button" class="admin-tab" data-tab="wallet" id="tab-wallet-btn">Wallet &amp; crypto</button>
         <button type="button" class="admin-tab" data-tab="audit" id="tab-audit-btn">Audit log</button>
       </nav>
 
@@ -131,6 +132,70 @@
             <tbody id="gc-history-tbody"></tbody>
           </table>
         </div>
+      </section>
+
+      <!-- WALLET & CRYPTO TAB -->
+      <section class="admin-panel hidden" id="panel-wallet">
+        <h2>Pending wallet deposits</h2>
+        <p class="admin-sub">BTC and ETH deposits stay pending until you confirm the funds arrived on-chain. Card deposits are auto-confirmed by the Stripe webhook.</p>
+        <div style="overflow-x:auto;">
+          <table class="admin-table" id="deposits-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Created</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="deposits-tbody"></tbody>
+          </table>
+        </div>
+        <p class="admin-empty hidden" id="deposits-empty">No pending deposits right now.</p>
+
+        <h2>Pending crypto orders</h2>
+        <p class="admin-sub">Crypto orders complete only here, after on-chain verification. This is the sole path that completes them.</p>
+        <div style="overflow-x:auto;">
+          <table class="admin-table" id="crypto-table">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Event / Tickets</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="crypto-tbody"></tbody>
+          </table>
+        </div>
+        <p class="admin-empty hidden" id="crypto-empty">No pending crypto orders.</p>
+
+        <h2>All wallet transactions</h2>
+        <div style="overflow-x:auto;">
+          <table class="admin-table" id="wallet-txns-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Kind</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Reference</th>
+                <th>Created</th>
+                <th>Confirmed</th>
+              </tr>
+            </thead>
+            <tbody id="wallet-txns-tbody"></tbody>
+          </table>
+        </div>
+        <p class="admin-empty hidden" id="wallet-txns-empty">No wallet transactions yet.</p>
       </section>
 
       <!-- AUDIT LOG TAB -->

@@ -16,6 +16,15 @@
     panelOrders: document.getElementById('panel-orders'),
     panelGiftcards: document.getElementById('panel-giftcards'),
 
+    // Wallet & crypto
+    panelWallet: document.getElementById('panel-wallet'),
+    depositsTbody: document.getElementById('deposits-tbody'),
+    depositsEmpty: document.getElementById('deposits-empty'),
+    cryptoTbody: document.getElementById('crypto-tbody'),
+    cryptoEmpty: document.getElementById('crypto-empty'),
+    walletTxnsTbody: document.getElementById('wallet-txns-tbody'),
+    walletTxnsEmpty: document.getElementById('wallet-txns-empty'),
+
     // Orders
     tableWrap: document.getElementById('admin-table-wrap'),
     tbody: document.getElementById('admin-tbody'),
@@ -86,7 +95,9 @@
     'admin.login.failed': ['bg-error', 'FAILED LOGIN'],
     'order.refund': ['bg-pending', 'REFUND'],
     'giftcard.create': ['bg-success', 'CREATE'],
-    'giftcard.toggle': ['bg-pending', 'TOGGLE']
+    'giftcard.toggle': ['bg-pending', 'TOGGLE'],
+    'wallet.deposit.confirm': ['bg-pending', 'DEPOSIT CONFIRM'],
+    'order.crypto.verify': ['bg-success', 'CRYPTO VERIFY']
   };
 
   function badge(tone, label) {
@@ -260,6 +271,129 @@
     els.gcHistory.classList.remove('hidden');
   }
 
+  /* ---------- Wallet & crypto tab ---------- */
+
+  const TXN_BADGE = {
+    deposit: ['bg-success', 'DEPOSIT'],
+    order_payment: ['bg-muted', 'PAYMENT'],
+    refund: ['bg-pending', 'REFUND']
+  };
+
+  const CRYPTO_METHOD_LABEL = { btc: 'BTC', eth: 'ETH' };
+
+  async function loadWallet() {
+    if (els.panelWallet.classList.contains('hidden')) return;
+    els.loading.classList.remove('hidden');
+    els.errorBanner.classList.add('hidden');
+    const [depRes, txnRes, orderRes] = await Promise.all([
+      api('/api/admin/wallet/deposits'),
+      api('/api/admin/wallet/transactions'),
+      api('/api/admin/orders')
+    ]);
+    els.loading.classList.add('hidden');
+
+    if (!depRes.ok) {
+      banner('error', (depRes.body && depRes.body.error) || 'Could not load wallet deposits.');
+      return;
+    }
+    if (!txnRes.ok) {
+      banner('error', (txnRes.body && txnRes.body.error) || 'Could not load wallet transactions.');
+      return;
+    }
+    if (!orderRes.ok) {
+      banner('error', (orderRes.body && orderRes.body.error) || 'Could not load orders.');
+      return;
+    }
+
+    const deposits = depRes.body.deposits || [];
+    els.depositsTbody.innerHTML = deposits.map(d => {
+      const amount = d.method === 'btc' || d.method === 'eth'
+        ? money(d.amountCents) + ' (crypto)'
+        : money(d.amountCents);
+      return `<tr>
+          <td class="mono"><strong>${escapeHTML(d.txnId)}</strong></td>
+          <td>${escapeHTML(d.name || '')}<br><span class="muted">${escapeHTML(d.email)}</span></td>
+          <td>${amount}</td>
+          <td>${escapeHTML(String(d.method || '').toUpperCase())}</td>
+          <td class="nowrap">${fmtDate(d.createdAt)}</td>
+          <td>${badge('bg-pending', 'PENDING')}</td>
+          <td class="nowrap">
+            <button class="btn btn-secondary btn-sm deposit-confirm-btn" data-txn="${escapeHTML(d.txnId)}" data-outcome="completed">Confirm received</button>
+            <button class="btn btn-ghost btn-sm deposit-confirm-btn" data-txn="${escapeHTML(d.txnId)}" data-outcome="failed">Mark failed</button>
+          </td>
+        </tr>`;
+    }).join('');
+    els.depositsEmpty.classList.toggle('hidden', deposits.length > 0);
+
+    const orders = orderRes.body.orders || [];
+    const cryptoOrders = orders.filter(o => o.payment_method === 'btc' || o.payment_method === 'eth');
+    els.cryptoTbody.innerHTML = cryptoOrders.map(o => {
+      const status = o.order_status === 'pending' ? 'PENDING' : o.order_status.toUpperCase();
+      return `<tr>
+          <td class="mono"><strong>${escapeHTML(o.order_number)}</strong></td>
+          <td>${escapeHTML(o.customer_name || '')}<br><span class="muted">${escapeHTML(o.email)}</span></td>
+          <td>${escapeHTML(o.tickets || '—')}</td>
+          <td><strong>${money(o.total_cents)}</strong></td>
+          <td>${escapeHTML(CRYPTO_METHOD_LABEL[o.payment_method] || String(o.payment_method).toUpperCase())}</td>
+          <td class="nowrap">${fmtDate(o.created_at)}</td>
+          <td>${o.order_status === 'paid' ? badge('bg-success', 'PAID') : badge('bg-pending', status)}
+            ${o.order_status === 'pending' ? `<button class="btn btn-primary btn-sm crypto-complete-btn" data-order="${escapeHTML(o.order_number)}">Confirm on-chain &amp; complete</button>` : ''}</td>
+        </tr>`;
+    }).join('');
+    els.cryptoEmpty.classList.toggle('hidden', cryptoOrders.length > 0);
+
+    const txns = txnRes.body.transactions || [];
+    els.walletTxnsTbody.innerHTML = txns.map(t => {
+      const b = TXN_BADGE[t.kind] || ['bg-muted', t.kind];
+      const positive = t.kind === 'deposit' || t.kind === 'refund';
+      const ref2 = t.reference || t.txnId;
+      return `<tr>
+          <td class="mono"><strong>${escapeHTML(t.txnId)}</strong></td>
+          <td>${escapeHTML(t.email || '—')}</td>
+          <td>${badge(b[0], b[1])}</td>
+          <td class="${positive ? 'amount-positive' : 'amount-negative'}">${positive ? '+' : '−'}${money(t.amountCents)}</td>
+          <td>${escapeHTML(String(t.method || '').toUpperCase() || '—')}</td>
+          <td>${badge(t.status === 'completed' ? 'bg-success' : t.status === 'failed' ? 'bg-error' : 'bg-pending', t.status.toUpperCase())}</td>
+          <td class="mono">${escapeHTML(ref2)}</td>
+          <td class="nowrap">${fmtDate(t.createdAt)}</td>
+          <td class="nowrap">${fmtDate(t.completedAt)}</td>
+        </tr>`;
+    }).join('');
+    els.walletTxnsEmpty.classList.toggle('hidden', txns.length > 0);
+  }
+
+  async function confirmDeposit(txnId, outcome) {
+    banner('success', '');
+    const action = outcome === 'completed'
+      ? 'Confirm receipt of wallet deposit'
+      : 'Mark this wallet deposit as failed';
+    if (!window.confirm(`${action} ${txnId}? This credits or reverses the customer's wallet balance.`)) return;
+    const { res, body } = await api('/api/admin/wallet/deposits/' + encodeURIComponent(txnId) + '/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ outcome })
+    });
+    if (!res.ok) {
+      banner('error', (body && body.error) || 'Could not update deposit.');
+      return;
+    }
+    banner('success', `Deposit ${txnId} ${outcome === 'completed' ? 'confirmed and credited' : 'marked failed'}.`);
+    await loadWallet();
+  }
+
+  async function completeCryptoOrder(orderNumber) {
+    banner('success', '');
+    if (!window.confirm(`Complete crypto order ${orderNumber} after on-chain verification? This marks the order paid and releases the tickets.`)) return;
+    const { res, body } = await api('/api/admin/orders/' + encodeURIComponent(orderNumber) + '/crypto/complete', {
+      method: 'POST'
+    });
+    if (!res.ok) {
+      banner('error', (body && body.error) || 'Could not complete the crypto order.');
+      return;
+    }
+    banner('success', `Crypto order ${orderNumber} completed and marked as paid.`);
+    await loadWallet();
+  }
+
   /* ---------- Audit log tab ---------- */
 
   async function loadAudit() {
@@ -297,12 +431,15 @@
     els.tabBtns.forEach(b => b.classList.toggle('is-active', b.dataset.tab === name));
     els.panelOrders.classList.toggle('hidden', name !== 'orders');
     els.panelGiftcards.classList.toggle('hidden', name !== 'giftcards');
+    els.panelWallet.classList.toggle('hidden', name !== 'wallet');
     els.panelAudit.classList.toggle('hidden', name !== 'audit');
     if (name === 'orders') {
       els.gcHistory.classList.add('hidden');
       loadOrders();
     } else if (name === 'giftcards') {
       loadGiftCards();
+    } else if (name === 'wallet') {
+      loadWallet();
     } else {
       loadAudit();
     }
@@ -370,6 +507,16 @@
 
   els.gcHistoryClose.addEventListener('click', () => {
     els.gcHistory.classList.add('hidden');
+  });
+
+  els.depositsTbody.addEventListener('click', (e) => {
+    const btn = e.target.closest('.deposit-confirm-btn');
+    if (btn) confirmDeposit(btn.dataset.txn, btn.dataset.outcome);
+  });
+
+  els.cryptoTbody.addEventListener('click', (e) => {
+    const btn = e.target.closest('.crypto-complete-btn');
+    if (btn) completeCryptoOrder(btn.dataset.order);
   });
 
   init();

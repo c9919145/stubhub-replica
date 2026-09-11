@@ -9,7 +9,7 @@ BTC/ETH crypto payments that remain PENDING until confirmed on-chain. Unavailabl
 
 - API + backend: complete, **76/76 tests passing** (`npm test`).
 - Frontend: customer account dashboard, Add Money top-up, checkout payment-method UI (wallet + crypto),
-  confirmation payment details — complete. Admin wallet/crypto endpoints are server-side; no admin UI tab yet.
+  confirmation payment details, and an admin **Wallet & crypto** tab — complete.
 - Verified: `npm run db:reset && npm start` boots and seeds demo data and serves all pages.
 - **Deployment reality:** the repo deploys as static files to **GitHub Pages**, which cannot run `/api/*`.
   Signup, wallet, and checkout only function behind a running Node server (`npm start`). See
@@ -142,8 +142,10 @@ Admin:
   BTC/ETH selection shows the address/QR panel and records the payment as pending (no success redirect).
 - `confirmation.js` — labels Wallet balance / BTC / ETH payments; crypto-pending orders show a note
   that completion follows on-chain confirmation.
-- `admin.html` / `js/admin.js` / `css/admin.css` — Orders / Gift cards tabs (existing).
-  Admin wallet/crypto confirmation endpoints exist on the server only; no admin UI tab yet.
+- `admin.html` / `js/admin.js` / `css/admin.css` — Orders / Gift cards / Audit tabs, plus a new
+  **Wallet & crypto** tab: pending deposits (Confirm received / Mark failed), pending crypto orders
+  (Confirm on-chain & complete — the sole path that completes them), and the full wallet transaction
+  feed across all users.
 - Existing card/PayPal checkout UI and gift-card flows are unchanged.
 
 ## Environment variables
@@ -187,7 +189,9 @@ move money, and always keep card numbers/CVVs out of the codebase.
 ## Demo data
 
 `npm run db:reset` / first boot seeds 3 × $500 gift cards; full codes print to the console once.
-Re-seeding is idempotent (skips when cards already exist). Default admin: `admin@ticketvault.test` / `adminpass123`,
+Re-seeding is idempotent (skips when cards already exist). Every boot also ensures the demo
+admin/customer accounts exist via an idempotent user upsert, so an old DB still gets
+`admin@ticketvault.test`. Default admin: `admin@ticketvault.test` / `adminpass123`,
 customer: `customer@ticketvault.test` / `password123`. Wallets start at $0; top up via `/api/wallet/deposits`
 (card → test-mode Stripe, or BTC/ETH → confirm via admin after "sending").
 

@@ -197,3 +197,20 @@
 .gc-history .admin-table {
   border: 0;
 }
+
+.muted {
+  color: #777;
+  font-size: 13.5px;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+
+.amount-positive { color: #14532d; font-weight: 600; }
+.amount-negative { color: #8b1e1e; font-weight: 600; }
