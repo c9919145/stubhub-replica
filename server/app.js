@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('node:path');
 
 const auth = require('./auth');
+const audit = require('./audit');
 const { AppError, createOrder, createOrApplyGiftCard, completeOrderPayment, findPendingOrderForEvent, getOrderByNumber, serializeOrder, listOrdersForUser, listAllOrders, markRefunded, failOrder } = require('./orders');
 const payments = require('./payments');
 const giftcards = require('./giftcards');
@@ -86,7 +87,50 @@ function createApp(config, deps) {
   const app = express();
   app.disable('x-powered-by');
 
+  /* ---------- security headers ---------- */
+  // Pragmatic CSP keeps the existing static frontend intact (inline styles and
+  // onclick handlers in the markup), while restricting external origins to the
+  // Google Fonts and image hosts the pages actually use.
+  app.use((req, res, next) => {
+    res.set({
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com data:",
+        "img-src 'self' data: https:",
+        "connect-src 'self'",
+        "frame-ancestors 'self'",
+        "base-uri 'self'",
+        "form-action 'self'"
+      ].join('; ')
+    });
+    if (config.isHttps || config.cookieSecure) {
+      res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    next();
+  });
+
   /* ---------- rate limiting (skip in test / when disabled) ---------- */
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: config.rateLimitEnabled === false ? 100000 : 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => res.status(429).json({ error: 'Too many attempts. Please try again shortly.' })
+  });
+  const adminLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: config.rateLimitEnabled === false ? 100000 : 40,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => res.status(429).json({ error: 'Too many admin actions. Please try again shortly.' })
+  });
   const limiter = rateLimit({
     windowMs: 10 * 60 * 1000,
     limit: config.rateLimitEnabled === false ? 100000 : 60,
@@ -197,7 +241,7 @@ function createApp(config, deps) {
   });
 
   /* ---------- auth ---------- */
-  app.post('/api/auth/register', limiter, (req, res) => {
+  app.post('/api/auth/register', authLimiter, (req, res) => {
     const { email, name, password } = req.body || {};
     const normalized = String(email || '').trim().toLowerCase();
     const pw = String(password || '');
@@ -221,15 +265,34 @@ function createApp(config, deps) {
     res.status(201).json({ user: auth.getPublicUser(user) });
   });
 
-  app.post('/api/auth/login', limiter, (req, res) => {
+  app.post('/api/auth/login', authLimiter, (req, res) => {
     const { email, password } = req.body || {};
     const normalized = String(email || '').trim().toLowerCase();
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(normalized);
     if (!user || !auth.verifyPassword(password, user.password_hash)) {
+      if (user && user.is_admin) {
+        audit.logAudit(db, {
+          adminUserId: user.id,
+          adminEmail: user.email,
+          action: 'admin.login.failed',
+          target: user.email,
+          details: 'Incorrect password',
+          ip: req.ip
+        });
+      }
       throw new AppError(401, 'INVALID_CREDENTIALS', 'Invalid email or password');
     }
     const token = auth.createSession(db, user.id, config.sessionTtlHours);
     setSessionCookie(res, token);
+    if (user.is_admin) {
+      audit.logAudit(db, {
+        adminUserId: user.id,
+        adminEmail: user.email,
+        action: 'admin.login',
+        target: user.email,
+        ip: req.ip
+      });
+    }
     res.json({ user: auth.getPublicUser(user) });
   });
 
@@ -524,7 +587,7 @@ function createApp(config, deps) {
     res.json({ orders: listAllOrders(db) });
   });
 
-  app.post('/api/admin/orders/:orderNumber/refund', requireAdmin, asyncHandler(async (req, res) => {
+  app.post('/api/admin/orders/:orderNumber/refund', adminLimiter, requireAdmin, asyncHandler(async (req, res) => {
     const order = getOrderByNumber(db, req.params.orderNumber);
     if (!order) return res.status(404).json({ error: 'Order not found' });
     if (order.status !== 'paid') {
@@ -538,6 +601,14 @@ function createApp(config, deps) {
     // Gift-card-only orders have no external payment to refund.
     if (payment && payment.provider === 'gift_card') {
       const result = markRefunded(db, `admin:gc:${order.order_number}`, payment.provider_payment_id);
+      audit.logAudit(db, {
+        adminUserId: req.user.id,
+        adminEmail: req.user.email,
+        action: 'order.refund',
+        target: order.order_number,
+        details: `Gift card order; amount ${order.total_cents}`,
+        ip: req.ip
+      });
       return res.json({ order: serializeOrder(db, result.order) });
     }
 
@@ -552,6 +623,14 @@ function createApp(config, deps) {
         throw new AppError(502, 'REFUND_FAILED', `PayPal refund failed: ${err.message}`);
       }
       const result = markRefunded(db, `admin:paypal:${order.payment_intent_id}`, order.payment_intent_id);
+      audit.logAudit(db, {
+        adminUserId: req.user.id,
+        adminEmail: req.user.email,
+        action: 'order.refund',
+        target: order.order_number,
+        details: `PayPal order; amount ${order.total_cents}`,
+        ip: req.ip
+      });
       return res.json({ order: serializeOrder(db, result.order) });
     }
 
@@ -567,6 +646,14 @@ function createApp(config, deps) {
     }
 
     const result = markRefunded(db, `admin:${refund.id}`, order.payment_intent_id);
+    audit.logAudit(db, {
+      adminUserId: req.user.id,
+      adminEmail: req.user.email,
+      action: 'order.refund',
+      target: order.order_number,
+      details: `Card order; amount ${order.total_cents}`,
+      ip: req.ip
+    });
     res.json({ order: serializeOrder(db, result.order) });
   }));
 
@@ -575,19 +662,43 @@ function createApp(config, deps) {
     res.json({ giftCards: giftcards.listGiftCards(db) });
   });
 
-  app.post('/api/admin/gift-cards', requireAdmin, (req, res) => {
+  app.post('/api/admin/gift-cards', adminLimiter, requireAdmin, (req, res) => {
     const { valueCents, expiresAt, count } = req.body || {};
+    const expires = expiresAt || null;
+    if (expires !== null && !/^\d{4}-\d{2}-\d{2}$/.test(String(expires))) {
+      throw new AppError(400, 'INVALID_EXPIRES_AT', 'expiresAt must be a YYYY-MM-DD date');
+    }
+    const n = count === undefined || count === null || count === '' ? 1 : Number(count);
+    if (!Number.isInteger(n) || n < 1 || n > 100) {
+      throw new AppError(400, 'INVALID_COUNT', 'count must be an integer between 1 and 100');
+    }
     const codes = giftcards.createGiftCards(db, {
       valueCents: Number(valueCents),
-      expiresAt: expiresAt || null,
+      expiresAt: expires,
       createdBy: req.user.id,
-      count: Number(count || 1)
+      count: n
+    });
+    audit.logAudit(db, {
+      adminUserId: req.user.id,
+      adminEmail: req.user.email,
+      action: 'giftcard.create',
+      target: null,
+      details: `${n} x ${Number(valueCents)} cents`,
+      ip: req.ip
     });
     res.status(201).json({ codes, count: codes.length });
   });
 
-  app.post('/api/admin/gift-cards/:id/toggle', requireAdmin, (req, res) => {
+  app.post('/api/admin/gift-cards/:id/toggle', adminLimiter, requireAdmin, (req, res) => {
     const gc = giftcards.toggleGiftCardActive(db, safeInt(req.params.id));
+    audit.logAudit(db, {
+      adminUserId: req.user.id,
+      adminEmail: req.user.email,
+      action: 'giftcard.toggle',
+      target: gc.code_masked,
+      details: gc.is_active ? 'enabled' : 'disabled',
+      ip: req.ip
+    });
     res.json({ giftCard: gc });
   });
 
@@ -595,6 +706,12 @@ function createApp(config, deps) {
     const gc = giftcards.getGiftCardById(db, safeInt(req.params.id));
     if (!gc) return res.status(404).json({ error: 'Gift card not found' });
     res.json({ giftCard: gc, redemptions: giftcards.redemptionsFor(db, gc.id) });
+  });
+
+  /* ---------- admin: audit log ---------- */
+  app.get('/api/admin/audit', requireAdmin, (req, res) => {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 200, 1), 500);
+    res.json({ entries: audit.listAudit(db, limit), limit });
   });
 
   /* ---------- API 404 + error handler ---------- */

@@ -41,6 +41,7 @@
       <nav class="admin-tabs" id="admin-tabs" aria-label="Admin sections">
         <button type="button" class="admin-tab is-active" data-tab="orders" id="tab-orders-btn">Orders</button>
         <button type="button" class="admin-tab" data-tab="giftcards" id="tab-giftcards-btn">Gift cards</button>
+        <button type="button" class="admin-tab" data-tab="audit" id="tab-audit-btn">Audit log</button>
       </nav>
 
       <div class="admin-login" id="admin-login">
@@ -129,6 +130,29 @@
             </thead>
             <tbody id="gc-history-tbody"></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- AUDIT LOG TAB -->
+      <section class="admin-panel hidden" id="panel-audit">
+        <p class="admin-sub">Immutable record of privileged admin actions (logins, refunds, gift card changes).</p>
+        <div class="hidden" id="audit-table-wrap">
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="audit-table">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Admin</th>
+                  <th>Action</th>
+                  <th>Target</th>
+                  <th>Details</th>
+                  <th>IP</th>
+                </tr>
+              </thead>
+              <tbody id="audit-tbody"></tbody>
+            </table>
+          </div>
+          <p class="admin-empty hidden" id="audit-empty">No audit entries yet.</p>
         </div>
       </section>
     </div>

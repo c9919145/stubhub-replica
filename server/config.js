@@ -14,13 +14,20 @@ function parsePercentOrPercentFloat(key, def) {
 function loadConfig(overrides = {}) {
   const env = { ...process.env, ...overrides };
 
+  const baseUrl = (env.BASE_URL || 'http://localhost:3000').replace(/\/+$/, '');
+  const isHttps = /^https:\/\//.test(baseUrl);
+  const cookieSecure = env.COOKIE_SECURE !== undefined
+    ? String(env.COOKIE_SECURE).toLowerCase() === 'true'
+    : (env.NODE_ENV === 'production' || isHttps);
+
   const config = {
     nodeEnv: env.NODE_ENV || 'development',
     port: Number(env.PORT || 3000),
-    baseUrl: (env.BASE_URL || 'http://localhost:3000').replace(/\/+$/, ''),
+    baseUrl,
+    isHttps,
     dbPath: env.DB_PATH || path.join(__dirname, '..', 'data', 'app.db'),
     feeRate: parsePercentOrPercentFloat('FEE_RATE', 0.10),
-    cookieSecure: String(env.COOKIE_SECURE || 'false').toLowerCase() === 'true',
+    cookieSecure,
     sessionTtlHours: Number(env.SESSION_TTL_HOURS || 24),
     reservationTtlMinutes: Number(env.RESERVATION_TTL_MINUTES || 30),
     rateLimitEnabled: String(env.RATE_LIMIT_ENABLED || 'true').toLowerCase() !== 'false',

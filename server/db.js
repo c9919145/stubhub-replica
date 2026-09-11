@@ -154,6 +154,19 @@ function initSchema(db) {
     );
     CREATE INDEX IF NOT EXISTS idx_gcr_card ON gift_card_redemptions(gift_card_id);
     CREATE INDEX IF NOT EXISTS idx_gcr_order ON gift_card_redemptions(order_id);
+
+    CREATE TABLE IF NOT EXISTS admin_audit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      admin_user_id INTEGER,
+      admin_email TEXT NOT NULL,
+      action TEXT NOT NULL,
+      target TEXT,
+      details TEXT,
+      ip TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_log(created_at);
+    CREATE INDEX IF NOT EXISTS idx_admin_audit_action ON admin_audit_log(action);
   `);
 
   ensureColumn(db, 'orders', 'discount_cents', 'INTEGER NOT NULL DEFAULT 0 CHECK (discount_cents >= 0)');

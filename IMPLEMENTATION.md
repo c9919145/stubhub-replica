@@ -6,7 +6,7 @@ including mixed payment (gift card + remainder via card or PayPal) and full gift
 
 ## Status
 
-- API + backend: complete, 56/56 tests passing (`npm test`).
+- API + backend: complete, 61/61 tests passing (`npm test`).
 - Frontend: checkout payment-method UI, admin gift-card management, confirmation payment details — complete.
 - Verified: `npm run db:reset && npm start` boots and seeds 3 demo gift cards whose full
   codes are printed to the console exactly once.

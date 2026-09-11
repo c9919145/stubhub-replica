@@ -34,7 +34,13 @@
     gcHistory: document.getElementById('gc-history'),
     gcHistoryTable: document.getElementById('gc-history-table'),
     gcHistoryTbody: document.getElementById('gc-history-tbody'),
-    gcHistoryClose: document.getElementById('gc-history-close')
+    gcHistoryClose: document.getElementById('gc-history-close'),
+
+    // Audit log
+    panelAudit: document.getElementById('panel-audit'),
+    auditTableWrap: document.getElementById('audit-table-wrap'),
+    auditTbody: document.getElementById('audit-tbody'),
+    auditEmpty: document.getElementById('audit-empty')
   };
 
   const money = cents => '$' + (Number(cents) / 100).toFixed(2);
@@ -73,6 +79,14 @@
     redeem: 'Redeemed',
     release: 'Released',
     refund: 'Refund'
+  };
+
+  const AUDIT_BADGE = {
+    'admin.login': ['bg-success', 'LOGIN'],
+    'admin.login.failed': ['bg-error', 'FAILED LOGIN'],
+    'order.refund': ['bg-pending', 'REFUND'],
+    'giftcard.create': ['bg-success', 'CREATE'],
+    'giftcard.toggle': ['bg-pending', 'TOGGLE']
   };
 
   function badge(tone, label) {
@@ -246,17 +260,51 @@
     els.gcHistory.classList.remove('hidden');
   }
 
+  /* ---------- Audit log tab ---------- */
+
+  async function loadAudit() {
+    if (els.panelAudit.classList.contains('hidden')) return;
+    els.loading.classList.remove('hidden');
+    els.errorBanner.classList.add('hidden');
+    const { res, body } = await api('/api/admin/audit');
+    els.loading.classList.add('hidden');
+    if (!res.ok) {
+      banner('error', (body && body.error) || 'Could not load audit log.');
+      return;
+    }
+
+    const entries = body.entries || [];
+    els.auditTbody.innerHTML = entries.length
+      ? entries.map(e => {
+        const b = AUDIT_BADGE[e.action] || ['bg-muted', e.action];
+        return `<tr>
+            <td class="nowrap">${fmtDate(e.created_at)}</td>
+            <td>${escapeHTML(e.admin_email)}</td>
+            <td>${badge(b[0], b[1])}</td>
+            <td class="mono">${escapeHTML(e.target || '—')}</td>
+            <td>${escapeHTML(e.details || '')}</td>
+            <td class="mono">${escapeHTML(e.ip || '—')}</td>
+          </tr>`;
+      }).join('')
+      : '';
+    els.auditEmpty.classList.toggle('hidden', entries.length > 0);
+    els.auditTableWrap.classList.remove('hidden');
+  }
+
   /* ---------- Tabs ---------- */
 
   function switchTab(name) {
     els.tabBtns.forEach(b => b.classList.toggle('is-active', b.dataset.tab === name));
     els.panelOrders.classList.toggle('hidden', name !== 'orders');
     els.panelGiftcards.classList.toggle('hidden', name !== 'giftcards');
+    els.panelAudit.classList.toggle('hidden', name !== 'audit');
     if (name === 'orders') {
       els.gcHistory.classList.add('hidden');
       loadOrders();
-    } else {
+    } else if (name === 'giftcards') {
       loadGiftCards();
+    } else {
+      loadAudit();
     }
   }
 
