@@ -183,10 +183,11 @@ The Pages site (`https://c9919145.github.io/stubhub-replica/`) is **static** —
 accounts by itself. To make registration work on the published URL, run the backend on a free
 Node host and point the frontend at it:
 
-1. **Deploy the backend.** Push this repo to your GitHub account, then on the host
-   (e.g. Render → *New → Web Service → connect repo*, or Fly.io/Railway) select this repo,
-   build/start command `npm install && npm start`, HTTP port `3000`.
-   The boot-seed creates the demo users automatically.
+1. **Deploy the backend.** This repo includes a `render.yaml` blueprint: on
+   [Render](https://render.com) use *New → Blueprint → connect this GitHub repo* — it creates
+   the web service with the right Node version, port, env vars, and health check automatically.
+   (Fly.io / Railway also work: Node 24, start command `npm install && npm start`, port 3000.)
+   Boot-seed creates the demo users automatically.
 2. **Set env vars on the host:**
    - `NODE_ENV=production`, `BASE_URL=https://<your-app>.onrender.com`
    - `APP_ORIGIN=https://c9919145.github.io` (the Pages origin that may call the API)

@@ -1,0 +1,52 @@
+# Render Blueprint — deploy the TicketVault backend in one click.
+# Flow: Render -> New -> Blueprint -> this repo -> it provisions the service below,
+# then set js/config.js apiBase to the generated URL (https://ticketvault-api.onrender.com).
+#
+# NOTE: Render's free tier cannot attach persistent disks. Without a disk the SQLite
+# database lives in the ephemeral filesystem and resets on each redeploy/restart.
+# For real customer accounts, use a paid plan and uncomment the disk + DB_PATH
+# override so users/orders persist.
+
+services:
+  - type: web
+    name: ticketvault-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: node --env-file-if-exists=.env server/index.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BASE_URL
+        value: https://ticketvault-api.onrender.com
+      - key: APP_ORIGIN
+        value: https://c9919145.github.io
+      - key: COOKIE_SAME_SITE
+        value: none
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: PORT
+        value: 3000
+      # ---- Optional real-money config (leave out for demo/placeholder) ----
+      # - key: PAYMENT_SECRET_KEY
+      #   sync: false
+      # - key: PAYMENT_PUBLISHABLE_KEY
+      #   sync: false
+      # - key: PAYMENT_WEBHOOK_SECRET
+      #   sync: false
+      # - key: PAYPAL_CLIENT_ID
+      #   sync: false
+      # - key: PAYPAL_CLIENT_SECRET
+      #   sync: false
+      # - key: PAYPAL_WEBHOOK_ID
+      #   sync: false
+      # ---- Persistent database (paid plans only) ----
+      # - key: DB_PATH
+      #   value: /var/data/app.db
+    # disk:
+    #   name: sqlite-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
