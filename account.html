@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account - TicketVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/wallet.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Vault</text>
+        </svg>
+      </a>
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+        <a href="payment-methods.html" class="btn btn-ghost btn-sm">Payment Methods</a>
+        <a href="add-money.html" class="btn btn-primary btn-sm">Add Money</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="account-main">
+    <section class="account-hero">
+      <h1>My Account</h1>
+      <p id="account-greeting">Loading your account…</p>
+    </section>
+
+    <section class="account-grid">
+
+      <div class="card wallet-card">
+        <div class="card-title-row">
+          <h2>Wallet Balance</h2>
+          <a href="add-money.html" class="btn btn-primary btn-sm">Add Money</a>
+        </div>
+        <div class="wallet-balance" id="wallet-balance">$0.00</div>
+        <p class="muted">Topped up from your bank goods or cards, and cryptocurrencies. Funds are only added after a payment is confirmed.</p>
+        <button class="btn btn-ghost btn-sm" id="toggle-transactions" type="button">Show Transactions</button>
+      </div>
+
+      <div class="card transactions-card hidden" id="transactions-card">
+        <h2>Wallet Transactions</h2>
+        <div id="transactions-list" class="txn-list">
+          <p class="muted">Loading…</p>
+        </div>
+      </div>
+
+      <div class="card orders-card">
+        <div class="card-title-row">
+          <h2>Your Orders</h2>
+          <button class="btn btn-ghost btn-sm" id="toggle-orders" type="button">Refresh</button>
+        </div>
+        <div id="orders-list" class="orders-list">
+          <p class="muted">Loading…</p>
+        </div>
+      </div>
+
+      <div class="card account-links-card">
+        <h2>Quick Links</h2>
+        <ul class="account-links">
+          <li><a href="tickets.html">Browse events</a></li>
+          <li><a href="payment-methods.html">Payment methods</a></li>
+          <li><a href="customer-service.html">Customer service</a></li>
+          <li><a href="index.html">Back to home</a></li>
+        </ul>
+        <button class="btn btn-secondary" id="logout-btn" type="button">Sign Out</button>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="rgba(255,255,255,0.15)"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="rgba(255,255,255,0.85)">Vault</text>
+        </svg>
+        <p>TicketVault is your independent destination for buying and selling event tickets.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="customer-service.html">Customer Service</a>
+        <a href="payment-methods.html">Payment Methods</a>
+        <a href="membership.html">Membership</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="account.html">My Account</a>
+        <a href="add-money.html">Wallet Top-Up</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 TicketVault. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/account.js"></script>
+</body>
+</html>

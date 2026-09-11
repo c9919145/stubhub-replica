@@ -155,6 +155,31 @@ function initSchema(db) {
     CREATE INDEX IF NOT EXISTS idx_gcr_card ON gift_card_redemptions(gift_card_id);
     CREATE INDEX IF NOT EXISTS idx_gcr_order ON gift_card_redemptions(order_id);
 
+    CREATE TABLE IF NOT EXISTS wallets (
+      user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      balance_cents INTEGER NOT NULL DEFAULT 0 CHECK (balance_cents >= 0),
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS wallet_transactions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      txn_id TEXT NOT NULL UNIQUE,
+      kind TEXT NOT NULL
+        CHECK (kind IN ('deposit','order_payment','refund','adjustment')),
+      amount_cents INTEGER NOT NULL,
+      method TEXT,
+      status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending','completed','failed')),
+      reference TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      completed_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_wallet_tx_user ON wallet_transactions(user_id, id);
+    CREATE INDEX IF NOT EXISTS idx_wallet_tx_status ON wallet_transactions(status);
+    CREATE INDEX IF NOT EXISTS idx_wallet_tx_ref ON wallet_transactions(kind, reference);
+
     CREATE TABLE IF NOT EXISTS admin_audit_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       admin_user_id INTEGER,

@@ -42,38 +42,47 @@
 
     <section style="max-width: 560px; margin: 0 auto; padding: 48px 24px;">
       <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-        <form id="register-form" style="max-width: 480px; margin: 0 auto;">
+        <form id="register-form" novalidate style="max-width: 480px; margin: 0 auto;">
+          <div id="form-error" class="form-alert hidden" role="alert"></div>
+          <div id="form-success" class="form-alert form-alert-success hidden" role="status"></div>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-            <div class="input-group">
+            <div class="input-group" data-field="firstName">
               <label for="firstName" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">First Name</label>
-              <input type="text" id="firstName" name="firstName" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+              <input type="text" id="firstName" name="firstName" required autocomplete="given-name" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+              <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
             </div>
-            <div class="input-group">
+            <div class="input-group" data-field="lastName">
               <label for="lastName" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Last Name</label>
-              <input type="text" id="lastName" name="lastName" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+              <input type="text" id="lastName" name="lastName" required autocomplete="family-name" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+              <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
             </div>
           </div>
-          <div class="input-group" style="margin-bottom: 16px;">
+          <div class="input-group" data-field="email" style="margin-bottom: 16px;">
             <label for="email" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Email</label>
-            <input type="email" id="email" name="email" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <input type="email" id="email" name="email" required autocomplete="email" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
           </div>
-          <div class="input-group" style="margin-bottom: 16px;">
+          <div class="input-group" data-field="password" style="margin-bottom: 16px;">
             <label for="password" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Password</label>
-            <input type="password" id="password" name="password" required minlength="8" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
             <small style="color: #666; font-size: 12px;">Minimum 8 characters</small>
+            <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
           </div>
-          <div class="input-group" style="margin-bottom: 16px;">
+          <div class="input-group" data-field="confirmPassword" style="margin-bottom: 16px;">
             <label for="confirmPassword" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #1b0045;">Confirm Password</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" required class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password" class="input-field" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
           </div>
-          <div style="margin-bottom: 24px;">
+          <div class="input-group" data-field="terms" style="margin-bottom: 24px;">
             <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
-              <input type="checkbox" id="terms" required style="margin-top: 4px;">
-              <span style="font-size: 14px; color: #666;">I agree to the <a href="#" style="color: #5e29ba;">Terms and Conditions</a> and <a href="#" style="color: #5e29ba;">Privacy Policy</a></span>
+              <input type="checkbox" id="terms" style="margin-top: 4px;">
+              <span style="font-size: 14px; color: #666;">I agree to the <a href="payment-methods.html" style="color: #5e29ba;">Terms and Conditions</a> and <a href="customer-service.html" style="color: #5e29ba;">Privacy Policy</a></span>
             </label>
+            <small class="field-error" style="color: #c62828; font-size: 12px;"></small>
           </div>
-          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; padding: 14px; font-size: 16px; background: #5e29ba; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Create Account</button>
-          <p style="text-align: center; margin-top: 16px; color: #666; font-size: 14px;">Already have an account? <a href="tickets.html" style="color: #5e29ba;">Sign in</a></p>
+          <button type="submit" id="submit-btn" class="btn btn-primary btn-lg" style="width: 100%; padding: 14px; font-size: 16px; background: #5e29ba; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Create Account</button>
+          <p style="text-align: center; margin-top: 16px; color: #666; font-size: 14px;">Already have an account? <a href="account.html" style="color: #5e29ba;">Sign in from your account home</a></p>
         </form>
       </div>
     </section>
@@ -107,56 +116,124 @@
   </footer>
 
   <style>
+    .form-alert { padding: 12px 14px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; border: 1px solid #f1c2c2; background: #fdeaea; color: #8b1e1e; }
+    .form-alert-success { color: #14532d; background: #e9f9ef; border-color: #bce3cc; }
+    .hidden { display: none; }
+    .input-group.has-error input { border-color: #c62828 !important; }
     @media (max-width: 768px) {
       .hero h1 { font-size: 28px !important; }
-      #register-form .input-group { grid-column: 1 / -1; }
-      #register-form > div:first-child { grid-template-columns: 1fr; }
+      #register-form > div:first-of-type { grid-template-columns: 1fr; }
     }
   </style>
 
   <script>
-  document.getElementById('register-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
+  (function() {
+    var form = document.getElementById('register-form');
+    var formError = document.getElementById('form-error');
+    var submitBtn = document.getElementById('submit-btn');
+    var busy = false;
 
-    var password = document.getElementById('password').value;
-    var confirmPassword = document.getElementById('confirmPassword').value;
-
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
+    function setFieldError(name, message) {
+      var group = form.querySelector('[data-field="' + name + '"]');
+      if (!group) return;
+      var small = group.querySelector('.field-error');
+      group.classList.toggle('has-error', Boolean(message));
+      if (small) small.textContent = message || '';
     }
 
-    if (password.length < 8) {
-      alert('Password must be at least 8 characters');
-      return;
+    function showFormError(message) {
+      formError.textContent = message || '';
+      formError.classList.toggle('hidden', !message);
     }
 
-    var formData = {
-      firstName: document.getElementById('firstName').value,
-      lastName: document.getElementById('lastName').value,
-      email: document.getElementById('email').value,
-      password: password
-    };
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
 
-    try {
-      var response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+    function validate() {
+      var ok = true;
+      var firstName = document.getElementById('firstName').value.trim();
+      var lastName = document.getElementById('lastName').value.trim();
+      var email = document.getElementById('email').value.trim();
+      var pw = document.getElementById('password').value;
+      var confirm = document.getElementById('confirmPassword').value;
+      var terms = document.getElementById('terms').checked;
 
-      var data = await response.json();
+      if (!firstName || !lastName) { setFieldError('firstName', firstName ? '' : 'First name is required'); setFieldError('lastName', lastName ? '' : 'Last name is required'); ok = false; }
+      else { setFieldError('firstName', ''); setFieldError('lastName', ''); }
 
-      if (response.ok) {
-        alert('Account created successfully! Please sign in.');
-        window.location.href = 'tickets.html';
-      } else {
-        alert(data.error || 'Registration failed. Please try again.');
+      if (!isValidEmail(email)) { setFieldError('email', 'Enter a valid email address'); ok = false; }
+      else setFieldError('email', '');
+
+      if (pw.length < 8) { setFieldError('password', 'Password must be at least 8 characters'); ok = false; }
+      else setFieldError('password', '');
+
+      if (pw !== confirm) { setFieldError('confirmPassword', 'Passwords do not match'); ok = false; }
+      else setFieldError('confirmPassword', '');
+
+      var termsError = terms ? '' : 'Please accept the Terms and Conditions before creating your account';
+      setFieldError('terms', termsError);
+      if (!terms) ok = false;
+
+      return ok;
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      showFormError('');
+      setFieldError('firstName', ''); setFieldError('lastName', '');
+      setFieldError('email', ''); setFieldError('password', '');
+      setFieldError('confirmPassword', ''); setFieldError('terms', '');
+      if (!validate() || busy) return;
+
+      busy = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account…';
+
+      var payload = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      };
+
+      try {
+        var response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        var data = {};
+        try { data = await response.json(); } catch (ignore) {}
+
+        if (response.ok) {
+          var user = data.user || {};
+          var name = user.name || 'there';
+          window.location.href = 'account.html?welcome=1' + (user.email ? '&email=' + encodeURIComponent(user.email) : '');
+          return;
+        }
+
+        var code = data.code;
+        if (code === 'EMAIL_TAKEN') {
+          setFieldError('email', 'An account with this email already exists. Please sign in instead.');
+        } else if (code === 'WEAK_PASSWORD') {
+          setFieldError('password', data.error || 'Password is too weak');
+        } else if (code === 'INVALID_NAME') {
+          setFieldError('firstName', data.error || 'Please enter your name');
+        } else {
+          showFormError(data.error || 'Registration failed. Please try again.');
+        }
+        busy = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+      } catch (error) {
+        showFormError('Network error. Please check your connection and try again.');
+        busy = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
       }
-    } catch (error) {
-      alert('Network error. Please try again.');
-    }
-  });
+    });
+  })();
   </script>
 </body>
 </html>

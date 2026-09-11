@@ -30,9 +30,9 @@ test('rejects invalid emails, weak passwords, and duplicate accounts', async (t)
 
   assert.equal((await app.app.post('/api/auth/register').send({ email: 'not-an-email', password: 'supersecret1' })).status, 400);
   assert.equal((await app.app.post('/api/auth/register').send({ email: 'a@b.dev', password: 'short' })).status, 400);
-  const first = await app.app.post('/api/auth/register').send({ email: 'dupe@user.dev', password: 'supersecret1' });
+  const first = await app.app.post('/api/auth/register').send({ email: 'dupe@user.dev', password: 'supersecret1', name: 'Dup User' });
   assert.equal(first.status, 201);
-  const dup = await app.app.post('/api/auth/register').send({ email: 'DUPE@user.dev', password: 'supersecret1' });
+  const dup = await app.app.post('/api/auth/register').send({ email: 'DUPE@user.dev', password: 'supersecret1', name: 'Dup User' });
   assert.equal(dup.status, 409);
   assert.equal(dup.body.code, 'EMAIL_TAKEN');
 });

@@ -94,7 +94,7 @@
   }
 
   function paymentSummary(order) {
-    const providerLabels = { stripe: 'Card', paypal: 'PayPal', gift_card: 'Gift card' };
+    const providerLabels = { stripe: 'Card', paypal: 'PayPal', gift_card: 'Gift card', wallet: 'Wallet balance', btc: 'BTC', eth: 'ETH' };
     const method = providerLabels[order.paymentMethod] || order.paymentMethod || 'Card';
     const lines = [`<span class="note" style="display:flex;justify-content:space-between;gap:var(--spacing-200);"><span>Method</span><strong>${escapeHTML(method)}</strong></span>`];
 
@@ -118,6 +118,12 @@
     }
     if (order.status === 'paid' && order.paymentMethod === 'gift_card') {
       lines.push('<span class="note">Your order was covered by a gift card. No card was charged.</span>');
+    }
+    if (order.status === 'paid' && order.paymentMethod === 'wallet') {
+      lines.push('<span class="note">Paid with your wallet balance.</span>');
+    }
+    if (order.status === 'pending' && (order.paymentMethod === 'btc' || order.paymentMethod === 'eth')) {
+      lines.push('<span class="note">This crypto payment is waiting for on-chain confirmation. Your order is completed by our team after the blockchain confirms the transaction.</span>');
     }
     return lines.join('');
   }

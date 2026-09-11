@@ -41,6 +41,8 @@ function loadConfig(overrides = {}) {
     paypalWebhookId: env.PAYPAL_WEBHOOK_ID || '',
     paypalMerchantEmail: env.PAYPAL_MERCHANT_EMAIL || '',
     giftCardDefaultLifeDays: Number(env.GIFT_CARD_DEFAULT_LIFE_DAYS || 365),
+    walletBtcAddress: env.WALLET_ADDRESS_BTC || 'bc1q82haxrn0a0utrm3usnq7ajecumvqzk453v54vu',
+    walletEthAddress: env.WALLET_ADDRESS_ETH || '0x814Bb1edC49Cebb9f592556333Ae3d5A626f7a60',
     adminEmail: env.ADMIN_EMAIL || 'admin@ticketvault.test',
     adminPassword: env.ADMIN_PASSWORD || 'adminpass123'
   };

@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const { withImmediateTransaction, rowid } = require('./db');
 const { AppError } = require('./errors');
 const giftcards = require('./giftcards');
+const wallet = require('./wallet');
 
 const MAX_LINE_ITEMS = 10;
 const MAX_QTY_PER_ITEM = 16;
@@ -282,6 +283,34 @@ function createOrderWithGiftCardInner(db, opts) {
 }
 
 /**
+ * Sells the order's tickets, redeems gift-card holds, marks the order paid and
+ * records a successful payment row. Runs inside an existing (open) transaction.
+ * Never derives amounts from the client — the caller passes the authoritative
+ * amount that was actually collected.
+ */
+function sellAndMarkPaid(db, order, { provider, providerPaymentId, amountCents }) {
+  const items = db.prepare('SELECT ticket_type_id, quantity FROM order_items WHERE order_id = ?').all(order.id);
+  const markSold = db.prepare(
+    `UPDATE ticket_types SET sold_quantity = sold_quantity + ?, reserved_quantity = MAX(0, reserved_quantity - ?)
+      WHERE id = ?`
+  );
+  items.forEach(i => markSold.run(i.quantity, i.quantity, i.ticket_type_id));
+
+  if (order.gift_card_cents > 0) giftcards.redeemHolds(db, order.id);
+
+  db.prepare(
+    `UPDATE orders SET status = 'paid', payment_method = COALESCE(payment_method, ?),
+       payment_intent_id = COALESCE(?, payment_intent_id), paid_at = datetime('now'), updated_at = datetime('now')
+      WHERE id = ?`
+  ).run(provider, providerPaymentId, order.id);
+
+  db.prepare(
+    `INSERT INTO payments (order_id, provider, provider_payment_id, amount_cents, currency, status)
+     VALUES (?, ?, ?, ?, 'usd', 'succeeded')`
+  ).run(order.id, provider, providerPaymentId || `unref_${order.id}`, amountCents);
+}
+
+/**
  * Marks an order paid, sells its tickets, redeems gift-card holds, and records a
  * successful payment. Idempotent per webhook event id and order status. Runs in
  * its own immediate transaction.
@@ -308,30 +337,74 @@ function completeOrderPayment(db, {
       return { order, idempotent: true, ignored: true };
     }
 
-    const items = db.prepare('SELECT ticket_type_id, quantity FROM order_items WHERE order_id = ?').all(order.id);
-    const markSold = db.prepare(
-      `UPDATE ticket_types SET sold_quantity = sold_quantity + ?, reserved_quantity = MAX(0, reserved_quantity - ?)
-        WHERE id = ?`
-    );
-    items.forEach(i => markSold.run(i.quantity, i.quantity, i.ticket_type_id));
-
-    if (order.gift_card_cents > 0) giftcards.redeemHolds(db, order.id);
-
     const amountCents = paidCents != null ? paidCents : order.total_cents - (order.gift_card_cents || 0);
-
-    db.prepare(
-      `UPDATE orders SET status = 'paid', payment_intent_id = COALESCE(?, payment_intent_id), paid_at = datetime('now'), updated_at = datetime('now')
-        WHERE id = ?`
-    ).run(providerPaymentId, order.id);
-
-    db.prepare(
-      `INSERT INTO payments (order_id, provider, provider_payment_id, amount_cents, currency, status)
-       VALUES (?, ?, ?, ?, 'usd', 'succeeded')`
-    ).run(order.id, provider, providerPaymentId || `unref_${order.id}`, amountCents);
+    sellAndMarkPaid(db, order, { provider, providerPaymentId, amountCents });
 
     recordWebhook(db, webhookEventId, eventType, order.id);
     return { order: getOrderById(db, order.id), idempotent: false };
   });
+}
+
+/**
+ * Completes a pending order using the customer's wallet balance. The wallet
+ * debit and the order completion happen in ONE immediate transaction; an
+ * insufficient balance fails the whole thing without selling any tickets.
+ * Idempotent via the order's status and the wallet order-payment reference.
+ */
+function completeOrderWithWallet(db, { orderNumber, userId, isAdmin = false }) {
+  return withImmediateTransaction(db, () => {
+    const order = getOrderByNumber(db, orderNumber);
+    if (!order) throw new AppError(404, 'ORDER_NOT_FOUND', 'Order not found');
+    if (order.user_id !== userId && !isAdmin) {
+      throw new AppError(404, 'ORDER_NOT_FOUND', 'Order not found');
+    }
+    if (order.status === 'paid') return { order, idempotent: true };
+    if (order.status !== 'pending') {
+      return { order, idempotent: true, ignored: true };
+    }
+    if (order.gift_card_cents > 0) {
+      throw new AppError(409, 'GIFT_CARD_APPLIED',
+        'This order already uses a gift card. Remove the gift card or start a new order to pay with your wallet.');
+    }
+    if (hasAnyPayment(db, order.id)) {
+      throw new AppError(409, 'PAYMENT_ALREADY_STARTED',
+        'This order already has a payment. Start a fresh order to pay differently.');
+    }
+
+    const amountCents = order.total_cents - (order.gift_card_cents || 0);
+    const debit = wallet.applyDebitForOrder(db, {
+      userId,
+      amountCents,
+      reference: order.order_number
+    });
+    if (debit.idempotent) {
+      db.prepare(`UPDATE orders SET status = 'paid', paid_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`)
+        .run(order.id);
+      return { order: getOrderById(db, order.id), idempotent: true };
+    }
+
+    const walletTxnId = debit.txnId;
+    sellAndMarkPaid(db, getOrderById(db, order.id), {
+      provider: 'wallet',
+      providerPaymentId: walletTxnId,
+      amountCents
+    });
+    recordWebhook(db, `wallet_pay_${order.order_number}`, 'wallet.order.completed', order.id);
+    return { order: getOrderById(db, order.id), idempotent: false, remainingWalletCents: debit.remaining };
+  });
+}
+
+/** Any payment record (any status) for an order. */
+function hasAnyPayment(db, orderId) {
+  return Boolean(db.prepare('SELECT 1 FROM payments WHERE order_id = ? LIMIT 1').get(orderId));
+}
+
+/** A payment record still in flight for an order. */
+function hasPendingPayment(db, orderId) {
+  return Boolean(
+    db.prepare(`SELECT 1 FROM payments WHERE order_id = ? AND status IN ('pending','processing','requires_action') LIMIT 1`)
+      .get(orderId)
+  );
 }
 
 /** Stripe webhook compatibility wrapper. */
@@ -519,6 +592,9 @@ module.exports = {
   orderItemsWithTickets,
   serializeOrder,
   completeOrderPayment,
+  completeOrderWithWallet,
+  hasAnyPayment,
+  hasPendingPayment,
   finalizePaid,
   failOrder,
   expireOrder,

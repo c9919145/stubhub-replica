@@ -7,7 +7,8 @@ const path = require('node:path');
 
 const auth = require('./auth');
 const audit = require('./audit');
-const { AppError, createOrder, createOrApplyGiftCard, completeOrderPayment, findPendingOrderForEvent, getOrderByNumber, serializeOrder, listOrdersForUser, listAllOrders, markRefunded, failOrder } = require('./orders');
+const wallet = require('./wallet');
+const { AppError, createOrder, createOrApplyGiftCard, completeOrderPayment, completeOrderWithWallet, findPendingOrderForEvent, getOrderByNumber, serializeOrder, listOrdersForUser, listAllOrders, markRefunded, failOrder, hasAnyPayment, hasPendingPayment } = require('./orders');
 const payments = require('./payments');
 const giftcards = require('./giftcards');
 const { PayPalClient, isConfigured } = require('./paypal');
@@ -145,6 +146,13 @@ function createApp(config, deps) {
     legacyHeaders: false,
     handler: (req, res) => res.status(429).json({ error: 'Too many orders. Please try again shortly.' })
   });
+  const walletLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: config.rateLimitEnabled === false ? 100000 : 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => res.status(429).json({ error: 'Too many wallet requests. Please try again shortly.' })
+  });
   const giftCardLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
     limit: config.rateLimitEnabled === false ? 100000 : 10,
@@ -242,13 +250,20 @@ function createApp(config, deps) {
 
   /* ---------- auth ---------- */
   app.post('/api/auth/register', authLimiter, (req, res) => {
-    const { email, name, password } = req.body || {};
+    const { email, name, password, firstName, lastName } = req.body || {};
     const normalized = String(email || '').trim().toLowerCase();
     const pw = String(password || '');
-    const displayName = String(name || '').trim();
+    // The membership form sends firstName/lastName; the API also accepts a single `name`.
+    const displayName = [firstName, lastName, name]
+      .map(v => String(v || '').trim())
+      .filter(Boolean)
+      .join(' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new AppError(400, 'INVALID_EMAIL', 'A valid email is required');
     if (pw.length < 8) throw new AppError(400, 'WEAK_PASSWORD', 'Password must be at least 8 characters');
+    if (!displayName) throw new AppError(400, 'INVALID_NAME', 'Your name is required');
     if (displayName.length > 80) throw new AppError(400, 'INVALID_NAME', 'Name is too long');
 
     if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(normalized)) {
@@ -303,6 +318,180 @@ function createApp(config, deps) {
   });
 
   app.get('/api/auth/me', requireAuth, (req, res) => res.json({ user: auth.getPublicUser(req.user) }));
+
+  /* ---------- customer wallet ---------- */
+  app.get('/api/wallet', requireAuth, (req, res) => {
+    res.json({ wallet: wallet.getWallet(db, req.user.id) });
+  });
+
+  /**
+   * Create a wallet top-up deposit. Card deposits redirect the user to a Stripe
+   * Checkout session; BTC/ETH deposits are PENDING until a payment is actually
+   * confirmed ON-CHAIN (admin/manual confirmation) — never by clicking a button.
+   */
+  app.post('/api/wallet/deposits', walletLimiter, requireAuth, asyncHandler(async (req, res) => {
+    const { amountCents, method } = req.body || {};
+    const amt = Number(amountCents);
+    if (!Number.isInteger(amt) || amt < wallet.MIN_DEPOSIT_CENTS || amt > wallet.MAX_DEPOSIT_CENTS) {
+      throw new AppError(400, 'INVALID_AMOUNT',
+        `Deposit must be between $${(wallet.MIN_DEPOSIT_CENTS / 100).toFixed(2)} and $${(wallet.MAX_DEPOSIT_CENTS / 100).toLocaleString()}`);
+    }
+    const m = String(method || '');
+    if (wallet.UNAVAILABLE_METHODS.includes(m)) {
+      throw new AppError(409, 'METHOD_UNAVAILABLE', 'This payment method is currently unavailable');
+    }
+    if (!wallet.DEPOSIT_METHODS[m]) {
+      throw new AppError(400, 'INVALID_METHOD', 'Select a supported payment method');
+    }
+    const txn = wallet.createDeposit(db, { userId: req.user.id, amountCents: amt, method: m });
+
+    if (m === 'card') {
+      const session = await payments.createWalletDepositSession(config, stripe, db, {
+        user: req.user,
+        txnId: txn.txn_id,
+        amountCents: amt
+      });
+      return res.json({ txnId: txn.txn_id, status: 'pending', method: m, checkoutUrl: session.url });
+    }
+
+    return res.json({
+      txnId: txn.txn_id,
+      status: 'pending',
+      method: m,
+      payment: wallet.cryptoInfo(config, m),
+      requiresVerification: true,
+      note: 'Your wallet is credited only after this deposit is confirmed.'
+    });
+  }));
+
+  app.post('/api/orders/wallet', orderLimiter, requireAuth, asyncHandler(async (req, res) => {
+    const { eventId, items } = req.body || {};
+    const eid = safeInt(eventId, 'Invalid event id');
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new AppError(400, 'INVALID_ITEMS', 'Select at least one ticket');
+    }
+    const event = db.prepare('SELECT * FROM events WHERE id = ?').get(eid);
+    if (!event) throw new AppError(404, 'EVENT_NOT_FOUND', 'Event not found');
+
+    const existing = findPendingOrderForEvent(db, req.user.id, eid);
+
+    // If there is no pending order, check for an already-paid one (idempotency).
+    if (!existing) {
+      const paid = db.prepare(
+        `SELECT o.* FROM orders o
+           JOIN order_items oi ON oi.order_id = o.id
+           JOIN ticket_types tt ON tt.id = oi.ticket_type_id
+          WHERE o.user_id = ? AND o.status = 'paid' AND tt.event_id = ?
+          LIMIT 1`
+      ).get(req.user.id, eid);
+      if (paid) return res.json({ order: serializeOrder(db, paid), idempotent: true });
+    }
+
+    const order = existing || createOrder(db, {
+      userId: req.user.id,
+      userEmail: req.user.email,
+      eventId: eid,
+      items,
+      feeRate: config.feeRate,
+      paymentMethod: 'wallet'
+    });
+
+    if (order.payment_method !== 'wallet') {
+      db.prepare(`UPDATE orders SET payment_method = 'wallet', updated_at = datetime('now') WHERE id = ?`).run(order.id);
+    }
+
+    const remaining = order.total_cents - (order.gift_card_cents || 0);
+    if (remaining <= 0) {
+      throw new AppError(409, 'GIFT_CARD_COVERS_ORDER', 'This order is already fully covered by a gift card');
+    }
+    if (hasAnyPayment(db, order.id)) {
+      throw new AppError(409, 'PAYMENT_ALREADY_STARTED',
+        'This order already has a payment. Start a fresh order to pay with your wallet.');
+    }
+
+    const result = completeOrderWithWallet(db, {
+      orderNumber: order.order_number,
+      userId: req.user.id,
+      isAdmin: req.user.is_admin
+    });
+    return res.json({ order: serializeOrder(db, result.order), idempotent: result.idempotent });
+  }));
+
+  app.post('/api/orders/crypto', orderLimiter, requireAuth, asyncHandler(async (req, res) => {
+    const { eventId, items, method } = req.body || {};
+    const eid = safeInt(eventId, 'Invalid event id');
+    const m = String(method || '').toLowerCase();
+    if (!['btc', 'eth'].includes(m)) throw new AppError(400, 'INVALID_METHOD', 'Select BTC or ETH for crypto payment');
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new AppError(400, 'INVALID_ITEMS', 'Select at least one ticket');
+    }
+    const event = db.prepare('SELECT * FROM events WHERE id = ?').get(eid);
+    if (!event) throw new AppError(404, 'EVENT_NOT_FOUND', 'Event not found');
+
+    const existing = findPendingOrderForEvent(db, req.user.id, eid);
+
+    // Idempotency: return the already-paid order instead of creating a duplicate.
+    if (!existing) {
+      const paid = db.prepare(
+        `SELECT o.* FROM orders o
+           JOIN order_items oi ON oi.order_id = o.id
+           JOIN ticket_types tt ON tt.id = oi.ticket_type_id
+          WHERE o.user_id = ? AND o.status = 'paid' AND tt.event_id = ?
+          LIMIT 1`
+      ).get(req.user.id, eid);
+      if (paid) return res.json({ order: serializeOrder(db, paid), idempotent: true });
+    }
+
+    const order = existing || createOrder(db, {
+      userId: req.user.id,
+      userEmail: req.user.email,
+      eventId: eid,
+      items,
+      feeRate: config.feeRate,
+      paymentMethod: m
+    });
+
+    if (order.payment_method !== m) {
+      db.prepare(`UPDATE orders SET payment_method = ?, updated_at = datetime('now') WHERE id = ?`).run(m, order.id);
+    }
+
+    const remaining = order.total_cents - (order.gift_card_cents || 0);
+    if (remaining <= 0) {
+      throw new AppError(409, 'GIFT_CARD_COVERS_ORDER', 'This order is already fully covered by a gift card');
+    }
+
+    const existingCrypto = db.prepare(
+      `SELECT 1 FROM payments WHERE order_id = ? AND provider = 'crypto' ORDER BY id DESC LIMIT 1`
+    ).get(order.id);
+    if (existingCrypto) {
+      return res.json({
+        orderNumber: order.order_number,
+        status: 'pending',
+        method: m,
+        payment: wallet.cryptoInfo(config, m),
+        requiresVerification: true,
+        note: 'This order already has a pending crypto payment. It will complete after on-chain confirmation.'
+      });
+    }
+    if (hasAnyPayment(db, order.id)) {
+      throw new AppError(409, 'PAYMENT_ALREADY_STARTED',
+        'This order already has a payment. Start a fresh order to pay with crypto.');
+    }
+
+    db.prepare(
+      `INSERT INTO payments (order_id, provider, provider_order_id, amount_cents, currency, status)
+       VALUES (?, 'crypto', ?, ?, 'usd', 'pending')`
+    ).run(order.id, order.order_number, remaining);
+
+    return res.json({
+      orderNumber: order.order_number,
+      status: 'pending',
+      method: m,
+      payment: wallet.cryptoInfo(config, m),
+      requiresVerification: true,
+      note: 'Send the exact amount to the address shown. Your order is completed only after the payment is confirmed on-chain.'
+    });
+  }));
 
   /* ---------- orders ---------- */
   app.post('/api/orders', orderLimiter, requireAuth, asyncHandler(async (req, res) => {
@@ -587,6 +776,75 @@ function createApp(config, deps) {
     res.json({ orders: listAllOrders(db) });
   });
 
+  app.get('/api/admin/wallet/deposits', requireAdmin, (req, res) => {
+    res.json({ deposits: wallet.listPendingDeposits(db, req.query.limit) });
+  });
+
+  app.get('/api/admin/wallet/transactions', requireAdmin, (req, res) => {
+    res.json({ transactions: wallet.listAdminWalletTxns(db, req.query.limit) });
+  });
+
+  /**
+   * Admin confirms that a wallet deposit was actually received and verified
+   * (Stripe webhook already auto-confirms card deposits; this endpoint is for
+   * BTC/ETH deposits confirmed on-chain or manually). Never callable by users.
+   */
+  app.post('/api/admin/wallet/deposits/:txnId/confirm', adminLimiter, requireAdmin, asyncHandler(async (req, res) => {
+    const txnId = String(req.params.txnId || '');
+    const outcome = String((req.body || {}).outcome || '');
+    if (!txnId || !['completed', 'failed'].includes(outcome)) {
+      throw new AppError(400, 'INVALID_OUTCOME', "outcome must be 'completed' or 'failed'");
+    }
+    const txn = outcome === 'completed'
+      ? wallet.completeDeposit(db, txnId)
+      : wallet.failDeposit(db, txnId);
+    audit.logAudit(db, {
+      adminUserId: req.user.id,
+      adminEmail: req.user.email,
+      action: 'wallet.deposit.confirm',
+      target: txnId,
+      details: outcome,
+      ip: req.ip
+    });
+    return res.json({ transaction: txn, idempotent: txn.idempotent });
+  }));
+
+  /**
+   * Admin confirms a crypto order was paid after on-chain verification and
+   * completes it. No user-facing endpoint can ever do this.
+   */
+  app.post('/api/admin/orders/:orderNumber/crypto/complete', adminLimiter, requireAdmin, asyncHandler(async (req, res) => {
+    const order = getOrderByNumber(db, req.params.orderNumber);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    if (order.status === 'paid') {
+      return res.json({ order: serializeOrder(db, order), idempotent: true });
+    }
+    if (order.status !== 'pending') {
+      throw new AppError(409, 'ORDER_NOT_PENDING', `Order is ${order.status} and cannot be completed as crypto`);
+    }
+    if (!order.payment_intent_id) {
+      db.prepare(`UPDATE orders SET payment_intent_id = ?, updated_at = datetime('now') WHERE id = ?`)
+        .run(`crypto_verified_${order.order_number}`, order.id);
+    }
+    const result = completeOrderPayment(db, {
+      webhookEventId: `crypto_verify_${order.order_number}`,
+      orderNumber: order.order_number,
+      provider: 'crypto',
+      providerPaymentId: order.payment_intent_id || `crypto_verified_${order.order_number}`,
+      paidCents: order.total_cents,
+      eventType: 'crypto.verified'
+    });
+    audit.logAudit(db, {
+      adminUserId: req.user.id,
+      adminEmail: req.user.email,
+      action: 'order.crypto.verify',
+      target: order.order_number,
+      details: 'Crypto payment confirmed on-chain',
+      ip: req.ip
+    });
+    return res.json({ order: serializeOrder(db, result.order), idempotent: result.idempotent });
+  }));
+
   app.post('/api/admin/orders/:orderNumber/refund', adminLimiter, requireAdmin, asyncHandler(async (req, res) => {
     const order = getOrderByNumber(db, req.params.orderNumber);
     if (!order) return res.status(404).json({ error: 'Order not found' });
@@ -632,6 +890,32 @@ function createApp(config, deps) {
         ip: req.ip
       });
       return res.json({ order: serializeOrder(db, result.order) });
+    }
+
+    // Wallet orders are refunded by crediting the customer's wallet balance.
+    if (payment && payment.provider === 'wallet') {
+      wallet.creditOrderRefund(db, {
+        userId: order.user_id,
+        reference: order.order_number,
+        orderTotalCents: order.total_cents
+      });
+      const result = markRefunded(db, `admin:wallet:${order.order_number}`, payment.provider_payment_id);
+      audit.logAudit(db, {
+        adminUserId: req.user.id,
+        adminEmail: req.user.email,
+        action: 'order.refund',
+        target: order.order_number,
+        details: `Wallet order; amount ${order.total_cents} credited to wallet`,
+        ip: req.ip
+      });
+      return res.json({ order: serializeOrder(db, result.order) });
+    }
+
+    // Crypto orders cannot be auto-refunded through a payment provider; the
+    // operator must reconcile the refund on-chain manually.
+    if (payment && payment.provider === 'crypto') {
+      throw new AppError(409, 'CRYPTO_REFUND_MANUAL',
+        'Crypto payments must be refunded manually on-chain by the operator');
     }
 
     if (!order.payment_intent_id) {

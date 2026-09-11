@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Money - My Wallet - TicketVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/wallet.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-top">
+      <a href="index.html" class="header-logo">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="#5e29ba"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1b0045">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#5e29ba">Vault</text>
+        </svg>
+      </a>
+      <div class="header-actions">
+        <a href="account.html" class="btn btn-ghost btn-sm">My Account</a>
+        <a href="payment-methods.html" class="btn btn-ghost btn-sm">Payment Methods</a>
+        <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="addmoney-main">
+    <section class="addmoney-hero">
+      <h1>Add Money to Your Wallet</h1>
+      <p>Top up once, then check out instantly with your wallet balance.</p>
+    </section>
+
+    <div class="addmoney-card">
+      <div id="addmoney-form">
+        <div class="form-alert hidden" id="am-error"></div>
+
+        <label class="field-label" for="amount">Amount</label>
+        <div class="amount-presets" id="amount-presets">
+          <button type="button" class="amount-preset" data-amount="5000">$50</button>
+          <button type="button" class="amount-preset" data-amount="10000">$100</button>
+          <button type="button" class="amount-preset" data-amount="25000">$250</button>
+          <button type="button" class="amount-preset" data-amount="50000">$500</button>
+        </div>
+        <input type="number" id="amount" class="amount-input" min="1" max="50000" step="1" placeholder="Enter a custom amount (e.g. 75)" inputmode="decimal">
+        <p class="muted">Minimum $1.00 · Maximum $50,000.00</p>
+
+        <label class="field-label">Payment method</label>
+        <div class="deposit-methods" id="deposit-methods">
+          <label class="dm-option">
+            <input type="radio" name="deposit-method" value="card" checked>
+            <span>Credit Card <small class="pm-tag">bank card · PCI-compliant</small></span>
+          </label>
+          <label class="dm-option">
+            <input type="radio" name="deposit-method" value="btc">
+            <span>BTC / Bitcoin</span>
+          </label>
+          <label class="dm-option">
+            <input type="radio" name="deposit-method" value="eth">
+            <span>ETH / Ethereum</span>
+          </label>
+          <label class="dm-option is-unavailable">
+            <input type="radio" name="deposit-method" value="usdt" disabled>
+            <span>USDT <small class="pm-tag">Currently unavailable</small></span>
+          </label>
+          <label class="dm-option is-unavailable">
+            <input type="radio" name="deposit-method" value="cash_app" disabled>
+            <span>Cash App <small class="pm-tag">Currently unavailable</small></span>
+          </label>
+          <label class="dm-option is-unavailable">
+            <input type="radio" name="deposit-method" value="money_order" disabled>
+            <span>Money Order <small class="pm-tag">Currently unavailable</small></span>
+          </label>
+          <label class="dm-option is-unavailable">
+            <input type="radio" name="deposit-method" value="zelle" disabled>
+            <span>Bank Transfer / Zelle <small class="pm-tag">Currently unavailable</small></span>
+          </label>
+        </div>
+
+        <button class="btn btn-primary btn-lg w-full" id="deposit-btn" type="button">Continue</button>
+      </div>
+
+      <div class="hidden" id="am-pending">
+        <div class="form-alert form-alert-success" id="am-pending-msg"></div>
+        <p class="muted">Send the exact amount to the address below, then keep your transaction reference. Your wallet is credited <strong>only after</strong> our team confirms the payment on the network — usually within 1–2 hours after the blockchain confirms it.</p>
+        <p>Network: <strong id="am-network"></strong></p>
+        <div class="crypto-pay-row">
+          <code id="am-address" class="crypto-address"></code>
+          <button type="button" class="btn btn-secondary btn-sm" id="copy-am-address">Copy</button>
+        </div>
+        <img id="am-qr" width="180" height="180" alt="QR code for the payment address">
+        <p class="muted">Deposit reference: <strong id="am-ref"></strong></p>
+        <a href="account.html" class="btn btn-primary btn-lg w-full">Back to My Account</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <svg viewBox="0 0 200 32" fill="none" xmlns="http://www.w3.org/2000/svg" height="28">
+          <rect width="32" height="32" rx="6" fill="rgba(255,255,255,0.15)"/>
+          <text x="16" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="white">TV</text>
+          <text x="42" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="white">Ticket</text>
+          <text x="115" y="23" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="rgba(255,255,255,0.85)">Vault</text>
+        </svg>
+        <p>TicketVault is your independent destination for buying and selling event tickets.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="customer-service.html">Customer Service</a>
+        <a href="payment-methods.html">Payment Methods</a>
+        <a href="membership.html">Membership</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="account.html">My Account</a>
+        <a href="add-money.html">Wallet Top-Up</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 TicketVault. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/add-money.js"></script>
+</body>
+</html>

@@ -24,6 +24,7 @@ function resetDb(dbPath) {
     db.exec(`DROP TABLE IF EXISTS webhook_events; DROP TABLE IF EXISTS payments; DROP TABLE IF EXISTS order_items;
              DROP TABLE IF EXISTS orders; DROP TABLE IF EXISTS sessions; DROP TABLE IF EXISTS users;
              DROP TABLE IF EXISTS ticket_types; DROP TABLE IF EXISTS events;
+             DROP TABLE IF EXISTS wallet_transactions; DROP TABLE IF EXISTS wallets;
              DROP TABLE IF EXISTS gift_card_redemptions; DROP TABLE IF EXISTS gift_cards;`);
     return db;
   }

@@ -44,13 +44,26 @@
     summaryGiftRow: document.getElementById('summary-gift-row'),
     summaryGiftAmount: document.getElementById('summary-gift-amount'),
     summaryRemainingRow: document.getElementById('summary-remaining-row'),
-    summaryRemaining: document.getElementById('summary-remaining')
+    summaryRemaining: document.getElementById('summary-remaining'),
+    walletBox: document.getElementById('wallet-box'),
+    walletOrderTotal: document.getElementById('wallet-order-total'),
+    walletBalance: document.getElementById('wallet-balance'),
+    walletAmountUsed: document.getElementById('wallet-amount-used'),
+    walletError: document.getElementById('wallet-error'),
+    cryptoBox: document.getElementById('crypto-box'),
+    cryptoAmount: document.getElementById('crypto-amount'),
+    cryptoNetwork: document.getElementById('crypto-network'),
+    cryptoAddress: document.getElementById('crypto-address'),
+    copyCryptoAddress: document.getElementById('copy-crypto-address'),
+    cryptoQr: document.getElementById('crypto-qr')
   };
 
   let ticketTypes = [];
   let quantities = new Map();
   /** Applied gift card: { orderNumber, totalCents, appliedCents, remainingCents, covered } or null */
   let gift = null;
+  /** Wallet balance last fetched for the wallet payment option. */
+  let walletBalanceCents = null;
 
   const FEE_DISPLAY_RATE = 0.10;
 
@@ -228,6 +241,14 @@
         els.checkoutBtn.textContent = 'Continue with PayPal';
       } else if (method === 'gift_card') {
         els.checkoutBtn.textContent = 'Apply gift card and review';
+      } else if (method === 'wallet') {
+        if (walletBalanceCents === null) {
+          els.checkoutBtn.textContent = 'Check wallet balance';
+        } else {
+          els.checkoutBtn.textContent = 'Pay with wallet';
+        }
+      } else if (method === 'btc' || method === 'eth') {
+        els.checkoutBtn.textContent = 'Record crypto payment';
       } else {
         els.checkoutBtn.textContent = 'Continue to secure checkout';
       }
@@ -239,6 +260,12 @@
       els.checkoutBtnNote.textContent = 'Your gift card covers the full order. No payment will be collected.';
     } else if (method === 'paypal') {
       els.checkoutBtn.textContent = 'Pay remaining with PayPal';
+      els.checkoutBtnNote.textContent = `${money(gift.remainingCents)} remaining after gift card.`;
+    } else if (method === 'wallet') {
+      els.checkoutBtn.textContent = 'Pay remaining with wallet';
+      els.checkoutBtnNote.textContent = `${money(gift.remainingCents)} remaining after gift card.`;
+    } else if (method === 'btc' || method === 'eth') {
+      els.checkoutBtn.textContent = 'Record remaining payment with crypto';
       els.checkoutBtnNote.textContent = `${money(gift.remainingCents)} remaining after gift card.`;
     } else {
       els.checkoutBtn.textContent = 'Pay remaining with card';
@@ -308,7 +335,15 @@
     const method = paymentMethod();
     let url;
     let payload = {};
-    if (gift) {
+    if (method === 'wallet') {
+      url = '/api/orders/wallet';
+      payload = { eventId, items };
+      els.checkoutBtn.textContent = 'Paying with wallet…';
+    } else if (method === 'btc' || method === 'eth') {
+      url = '/api/orders/crypto';
+      payload = { eventId, items, method };
+      els.checkoutBtn.textContent = 'Recording crypto payment…';
+    } else if (gift) {
       if (gift.covered) {
         url = `/api/orders/${gift.orderNumber}/gift-card/complete`;
       } else if (method === 'paypal') {
@@ -353,6 +388,14 @@
       return;
     }
 
+    if (res.status === 409 && body && body.code === 'INSUFFICIENT_WALLET_BALANCE') {
+      els.walletError.textContent = (body && body.error) || 'Your wallet balance is not enough for this order.';
+      els.walletError.classList.remove('hidden');
+      els.checkoutBtn.disabled = false;
+      updateCheckoutButton();
+      return;
+    }
+
     if (res.ok && body && body.checkoutUrl) {
       window.location.href = body.checkoutUrl;
       return;
@@ -363,6 +406,10 @@
     }
     if (res.ok && body && body.order && body.order.status === 'paid') {
       window.location.href = 'confirm.html?order=' + encodeURIComponent(body.order.orderNumber);
+      return;
+    }
+    if (res.ok && body && body.status === 'pending' && body.requiresVerification) {
+      renderCryptoPending(body);
       return;
     }
 
@@ -406,9 +453,65 @@
     r.addEventListener('change', () => {
       els.giftCardBox.classList.toggle('hidden', r.value !== 'gift_card');
       if (r.value !== 'gift_card') els.giftCardMsg.textContent = '';
+      els.walletBox.classList.toggle('hidden', r.value !== 'wallet');
+      els.cryptoBox.classList.toggle('hidden', r.value !== 'btc' && r.value !== 'eth');
+      if (r.value === 'wallet') selectWallet();
       updateCheckoutButton();
     });
   });
+
+  function amountToPay() {
+    const subtotal = selectedItems().reduce((sum, it) => {
+      const tt = ticketTypes.find(t => t.id === it.ticketTypeId);
+      return sum + tt.priceCents * it.quantity;
+    }, 0);
+    const fees = Math.round(subtotal * FEE_DISPLAY_RATE);
+    return subtotal + fees - (gift ? gift.appliedCents : 0);
+  }
+
+  async function selectWallet() {
+    els.walletError.classList.add('hidden');
+    els.walletOrderTotal.textContent = money(amountToPay());
+    els.walletAmountUsed.textContent = '—';
+    const { res, body } = await api('/api/wallet');
+    if (res.status === 401) {
+      els.authGate.classList.remove('hidden');
+      els.loginEmail.focus();
+      els.walletBalance.textContent = 'Sign in required';
+      return;
+    }
+    if (!res.ok) {
+      els.walletBalance.textContent = 'Unavailable';
+      return;
+    }
+    walletBalanceCents = body.wallet.balanceCents;
+    els.walletBalance.textContent = money(walletBalanceCents);
+    els.walletAmountUsed.textContent = money(Math.min(walletBalanceCents, amountToPay()));
+    updateCheckoutButton();
+  }
+
+  els.copyCryptoAddress.addEventListener('click', async () => {
+    const addr = (els.cryptoAddress.textContent || '').trim();
+    if (!addr) return;
+    try {
+      await navigator.clipboard.writeText(addr);
+      els.copyCryptoAddress.textContent = 'Copied';
+      setTimeout(() => { els.copyCryptoAddress.textContent = 'Copy'; }, 1500);
+    } catch (e) { /* clipboard unavailable */ }
+  });
+
+  function renderCryptoPending(body) {
+    const p = body.payment || {};
+    els.cryptoAmount.textContent = money(body.amountCents != null ? body.amountCents : amountToPay());
+    els.cryptoNetwork.textContent = p.network || '';
+    els.cryptoAddress.textContent = p.address || '';
+    els.cryptoQr.src = p.qrImage || '';
+    els.cryptoQr.alt = p.network ? `QR code for the ${p.network} address` : 'QR code';
+    els.paymentMethods.classList.add('hidden');
+    els.checkoutBtn.classList.add('hidden');
+    els.checkoutBtnNote.classList.add('hidden');
+    els.cryptoBox.classList.remove('hidden');
+  }
 
   els.applyGiftCard.addEventListener('click', applyGiftCard);
   els.giftCardCode.addEventListener('keydown', (e) => {

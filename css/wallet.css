@@ -1,0 +1,295 @@
+/* ---------- Customer wallet: account dashboard, account, add-money, checkout panels ---------- */
+
+.account-main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+.account-hero h1 {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.account-hero p {
+  color: #666;
+  margin: 0 0 24px;
+  font-size: 15px;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.account-grid .card {
+  background: #fff;
+  border: 1px solid #e6e3ed;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(27, 0, 69, 0.05);
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 12px;
+  margin-bottom: 14px;
+}
+
+.card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.wallet-balance {
+  font-size: 40px;
+  font-weight: 800;
+  color: #5e29ba;
+  margin: 6px 0 10px;
+}
+
+.muted {
+  color: #777;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.txn-list ul,
+.orders-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.txn-item,
+.order-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0eef5;
+  font-size: 14px;
+}
+
+.txn-item:last-child,
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.txn-item .txn-top,
+.order-item .order-top {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 10px;
+  font-weight: 600;
+}
+
+.txn-item .txn-sub,
+.order-item .order-sub {
+  color: #888;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.order-item .order-status {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.order-status.order-paid { background: #e9f9ef; color: #14532d; }
+.order-status.order-pending { background: #fff7e0; color: #7a5c00; }
+.order-status.order-cancelled { background: #fdeaea; color: #8b1e1e; }
+
+.amount-positive { color: #14532d; }
+.amount-negative { color: #8b1e1e; }
+
+.account-links {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.account-links li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0eef5;
+}
+
+.account-links li:last-child {
+  border-bottom: none;
+}
+
+.account-links a:link,
+.account-links a:visited {
+  color: #5e29ba;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.account-links a:hover { text-decoration: underline; }
+
+/* ---------- Add money (top-up) ---------- */
+
+.addmoney-main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+.addmoney-hero h1 {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.addmoney-hero p {
+  color: #666;
+  margin: 0 0 24px;
+  font-size: 15px;
+}
+
+.addmoney-card {
+  background: #fff;
+  border: 1px solid #e6e3ed;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(27, 0, 69, 0.05);
+}
+
+.field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.amount-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.amount-preset {
+  border: 1px solid #e0dced;
+  border-radius: 10px;
+  padding: 12px 0;
+  background: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  color: #1b0045;
+}
+
+.amount-preset:hover { border-color: #5e29ba; }
+.amount-preset.is-active { border-color: #5e29ba; background: #f1eaff; color: #5e29ba; }
+
+.amount-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cfc8e0;
+  border-radius: 10px;
+  font-size: 16px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.amount-input:focus { outline: none; border-color: #5e29ba; box-shadow: 0 0 0 3px rgba(94, 41, 186, 0.15); }
+
+.deposit-methods {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+
+.dm-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e0dced;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.dm-option:hover { border-color: #5e29ba; }
+.dm-option.is-unavailable { opacity: 0.55; cursor: not-allowed; }
+.dm-option.is-unavailable:has(input:disabled) { pointer-events: none; }
+.dm-option input { accent-color: #5e29ba; }
+
+.pm-tag {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #a66c00;
+}
+
+.form-alert { padding: 12px 14px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; border: 1px solid #f1c2c2; background: #fdeaea; color: #8b1e1e; }
+.form-alert-success { color: #14532d; background: #e9f9ef; border-color: #bce3cc; }
+
+/* ---------- Checkout payment detail panels ---------- */
+
+.pm-option .pm-sub {
+  display: block;
+  font-weight: 400;
+  color: #888;
+  font-size: 12.5px;
+  margin-top: 2px;
+}
+
+.pm-option.is-unavailable { opacity: 0.55; cursor: not-allowed; }
+
+.pm-detail-box {
+  margin-top: 12px;
+  background: #f8f6fc;
+  border: 1px solid #e6e3ed;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #2a2140;
+}
+
+.pm-detail-box p { margin: 0 0 8px; }
+.pm-detail-box p:last-child { margin-bottom: 0; }
+
+.pm-detail-error {
+  color: #8b1e1e;
+  font-weight: 600;
+}
+
+.crypto-pay-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.crypto-address {
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+  border: 1px dashed #cfc8e0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+  color: #1b0045;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 768px) {
+  .account-grid { grid-template-columns: 1fr; }
+  .amount-presets { grid-template-columns: repeat(2, 1fr); }
+  .wallet-balance { font-size: 32px; }
+}
