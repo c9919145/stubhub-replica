@@ -45,7 +45,7 @@
   });
 
   async function api(url, options) {
-    const res = await fetch(url, {
+    const res = await fetch(apiUrl(url), {
       headers: { 'Content-Type': 'application/json' },
       ...options
     });

@@ -177,6 +177,30 @@ Full functionality (signup, wallet, checkout, webhooks) requires the Node server
 5. Crypto flow needs a human step: confirm the on-chain deposit/order via the admin endpoints.
 6. `npm test` runs the full suite (76 tests) in a throwaway in-memory DB.
 
+### Making signup/login work from the GitHub Pages site
+
+The Pages site (`https://c9919145.github.io/stubhub-replica/`) is **static** — it cannot create
+accounts by itself. To make registration work on the published URL, run the backend on a free
+Node host and point the frontend at it:
+
+1. **Deploy the backend.** Push this repo to your GitHub account, then on the host
+   (e.g. Render → *New → Web Service → connect repo*, or Fly.io/Railway) select this repo,
+   build/start command `npm install && npm start`, HTTP port `3000`.
+   The boot-seed creates the demo users automatically.
+2. **Set env vars on the host:**
+   - `NODE_ENV=production`, `BASE_URL=https://<your-app>.onrender.com`
+   - `APP_ORIGIN=https://c9919145.github.io` (the Pages origin that may call the API)
+   - `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` (cross-site, HTTPS session cookie)
+3. **Point the static site at the backend.** In `js/config.js` set
+   `apiBase: 'https://<your-app>.onrender.com'` and push — GitHub Pages re-deploys and every
+   page (`/api/auth/register`, `/api/auth/login`, wallet, checkout) then calls the live backend.
+   CORS + `SameSite=None; Secure` session cookies are already handled server-side.
+4. **Persistence caveat:** the app stores data in a local SQLite file (`data/app.db`). Free-tier
+   hosts *do not guarantee* that file survives a redeploy/restart. For real customers use a host
+   with a persistent disk (or `DB_PATH` on a mounted volume); test setups may accept data resets.
+5. Keep using placeholder Stripe/PayPal values until real credentials are configured, and never
+   put card numbers/CVVs in the codebase.
+
 For the hosted demo, replace real Stripe keys with placeholder values so the static site can't
 move money, and always keep card numbers/CVVs out of the codebase.
 

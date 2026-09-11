@@ -40,7 +40,7 @@
   }
 
   async function api(url, options) {
-    const res = await fetch(url, {
+    const res = await fetch(apiUrl(url), {
       headers: { 'Content-Type': 'application/json' },
       ...options
     });
@@ -145,7 +145,7 @@
         window.location.href = 'account.html';
         return;
       }
-      showSigninError((body && body.error) || 'Invalid email or password.');
+      showSigninError(body && body.error ? body.error : 'The sign-in server is not reachable. This page is a static preview — start the backend (npm start) or deploy it and set apiBase in js/config.js.');
     } catch (err) {
       showSigninError('Could not reach the server. Make sure the application is running, then try again.');
     }

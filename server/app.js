@@ -179,12 +179,29 @@ function createApp(config, deps) {
   function setSessionCookie(res, token) {
     res.cookie('sid', token, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: config.cookieSameSite,
       secure: config.cookieSecure,
       maxAge: config.sessionTtlHours * 3600 * 1000,
       path: '/'
     });
   }
+
+  /* ---------- CORS: allow the static GitHub Pages frontend to reach this API
+     cross-origin when APP_ORIGIN is configured (e.g. https://c9919145.github.io). ---------- */
+  app.set('trust proxy', config.nodeEnv === 'production' ? 1 : false);
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && config.allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.setHeader('Access-Control-Max-Age', '600');
+    }
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    next();
+  });
 
   /* ---------- webhook (raw body, route registered before express.json) ---------- */
   app.post('/webhook/stripe', express.raw({ type: 'application/json' }), (req, res) => {

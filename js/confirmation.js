@@ -32,7 +32,7 @@
   };
 
   async function fetchOrder() {
-    const res = await fetch('/api/orders/' + encodeURIComponent(orderNumber || ''), { headers: { 'Content-Type': 'application/json' } });
+    const res = await fetch(apiUrl('/api/orders/' + encodeURIComponent(orderNumber || '')), { headers: { 'Content-Type': 'application/json' } });
     let body = null;
     try { body = await res.json(); } catch (e) { /* ignore */ }
     return { res, body };

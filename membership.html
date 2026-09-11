@@ -126,6 +126,8 @@
     }
   </style>
 
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
   <script>
   (function() {
     var form = document.getElementById('register-form');
@@ -198,7 +200,7 @@
       };
 
       try {
-        var response = await fetch('/api/auth/register', {
+        var response = await fetch(apiUrl('/api/auth/register'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -220,6 +222,8 @@
           setFieldError('password', data.error || 'Password is too weak');
         } else if (code === 'INVALID_NAME') {
           setFieldError('firstName', data.error || 'Please enter your name');
+        } else if (!data || (!data.error && !data.code)) {
+          showFormError('The registration server is not reachable. This page is a static preview — start the backend (npm start) or deploy it and set apiBase in js/config.js.');
         } else {
           showFormError(data.error || 'Registration failed. Please try again.');
         }

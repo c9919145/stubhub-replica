@@ -28,6 +28,8 @@ function loadConfig(overrides = {}) {
     dbPath: env.DB_PATH || path.join(__dirname, '..', 'data', 'app.db'),
     feeRate: parsePercentOrPercentFloat('FEE_RATE', 0.10),
     cookieSecure,
+    cookieSameSite: env.COOKIE_SAME_SITE || ((env.NODE_ENV === 'production' || isHttps) ? 'none' : 'lax'),
+    allowedOrigins: (env.APP_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean),
     sessionTtlHours: Number(env.SESSION_TTL_HOURS || 24),
     reservationTtlMinutes: Number(env.RESERVATION_TTL_MINUTES || 30),
     rateLimitEnabled: String(env.RATE_LIMIT_ENABLED || 'true').toLowerCase() !== 'false',

@@ -105,7 +105,7 @@
   }
 
   async function api(url, options) {
-    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
+    const res = await fetch(apiUrl(url), { headers: { 'Content-Type': 'application/json' }, ...options });
     let body = null;
     try { body = await res.json(); } catch (e) { /* ignore */ }
     return { res, body };
