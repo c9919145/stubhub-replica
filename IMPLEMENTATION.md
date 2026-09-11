@@ -137,9 +137,10 @@ Admin:
   (card / btc / eth; others disabled), card → Stripe redirect, BTC/ETH → PENDING panel
   (network, address, QR, copy button) explaining the credit comes only after confirmation.
 - `checkout.html` / `js/checkout.js` — payment-method radios: Credit Card, Wallet Balance
-  (shows balance + amount to pay, instant `POST /api/orders/wallet`), BTC, PayPal, Gift card,
-  and USDT / Cash App / Money Order / Zelle shown as **Currently unavailable** (disabled).
-  BTC/ETH selection shows the address/QR panel and records the payment as pending (no success redirect).
+  (shows balance + amount to pay, instant `POST /api/orders/wallet`), BTC, Gift card,
+  and USDT / Cash App / Money Order / Zelle shown as **Currently unavailable** (disabled) —
+  only configured methods are selectable. BTC selection shows the address/QR panel and records
+  the payment as pending (no success redirect). PayPal is not shown unless its env vars are set.
 - `confirmation.js` — labels Wallet balance / BTC / ETH payments; crypto-pending orders show a note
   that completion follows on-chain confirmation.
 - `admin.html` / `js/admin.js` / `css/admin.css` — Orders / Gift cards / Audit tabs, plus a new

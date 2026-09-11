@@ -237,9 +237,7 @@
       return;
     }
     if (!gift) {
-      if (method === 'paypal') {
-        els.checkoutBtn.textContent = 'Continue with PayPal';
-      } else if (method === 'gift_card') {
+      if (method === 'gift_card') {
         els.checkoutBtn.textContent = 'Apply gift card and review';
       } else if (method === 'wallet') {
         if (walletBalanceCents === null) {
@@ -247,7 +245,7 @@
         } else {
           els.checkoutBtn.textContent = 'Pay with wallet';
         }
-      } else if (method === 'btc' || method === 'eth') {
+      } else if (method === 'btc') {
         els.checkoutBtn.textContent = 'Record crypto payment';
       } else {
         els.checkoutBtn.textContent = 'Continue to secure checkout';
@@ -258,13 +256,10 @@
     if (gift.covered) {
       els.checkoutBtn.textContent = 'Place order';
       els.checkoutBtnNote.textContent = 'Your gift card covers the full order. No payment will be collected.';
-    } else if (method === 'paypal') {
-      els.checkoutBtn.textContent = 'Pay remaining with PayPal';
-      els.checkoutBtnNote.textContent = `${money(gift.remainingCents)} remaining after gift card.`;
     } else if (method === 'wallet') {
       els.checkoutBtn.textContent = 'Pay remaining with wallet';
       els.checkoutBtnNote.textContent = `${money(gift.remainingCents)} remaining after gift card.`;
-    } else if (method === 'btc' || method === 'eth') {
+    } else if (method === 'btc') {
       els.checkoutBtn.textContent = 'Record remaining payment with crypto';
       els.checkoutBtnNote.textContent = `${money(gift.remainingCents)} remaining after gift card.`;
     } else {
@@ -339,22 +334,16 @@
       url = '/api/orders/wallet';
       payload = { eventId, items };
       els.checkoutBtn.textContent = 'Paying with wallet…';
-    } else if (method === 'btc' || method === 'eth') {
+    } else if (method === 'btc') {
       url = '/api/orders/crypto';
       payload = { eventId, items, method };
       els.checkoutBtn.textContent = 'Recording crypto payment…';
     } else if (gift) {
       if (gift.covered) {
         url = `/api/orders/${gift.orderNumber}/gift-card/complete`;
-      } else if (method === 'paypal') {
-        url = `/api/orders/${gift.orderNumber}/pay-remaining/paypal`;
       } else {
         url = `/api/orders/${gift.orderNumber}/pay-remaining/card`;
       }
-    } else if (method === 'paypal') {
-      url = '/api/orders/paypal';
-      payload = { eventId, items };
-      els.checkoutBtn.textContent = 'Opening PayPal…';
     } else {
       url = '/api/orders';
       payload = { eventId, items };
